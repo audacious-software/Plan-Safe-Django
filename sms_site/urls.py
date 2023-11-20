@@ -16,6 +16,7 @@ Including another URLconf
 from django.conf.urls import include, url
 from django.contrib import admin
 from django.urls import path
+from django.views.generic import RedirectView
 
 admin.autodiscover()
 admin.site.enable_nav_sidebar = False
@@ -27,4 +28,5 @@ urlpatterns = [
     url(r'^messages/', include('simple_messaging.urls')),
     url(r'^dashboard/', include('dashboard.urls')),
     url(r'^quicksilver/', include('quicksilver.urls')),
+    url(r'^$', RedirectView.as_view(url='/dashboard/')),
 ]
