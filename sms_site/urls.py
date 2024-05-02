@@ -13,10 +13,16 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.conf.urls import include, url
+import sys
+
 from django.contrib import admin
 from django.urls import path
 from django.views.generic import RedirectView
+
+if sys.version_info[0] > 2:
+    from django.urls import include, re_path as url
+else:
+    from django.conf.urls import include, url
 
 admin.autodiscover()
 admin.site.enable_nav_sidebar = False
