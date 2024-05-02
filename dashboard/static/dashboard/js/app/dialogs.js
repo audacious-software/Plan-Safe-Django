@@ -15,15 +15,16 @@ requirejs.config({
         app: '/static/dashboard/js/app',
         material: "/static/dashboard/js/vendor/material-components-web-11.0.0",
         jquery: "/static/dashboard/js/vendor/jquery-3.4.0.min",
-        cookie: "/static/dashboard/js/vendor/js.cookie"
-    }
+        cookie: "/static/dashboard/js/vendor/js.cookie",
+		moment: '/static/dashboard/js/vendor/moment-with-locales'
+	}
 });
 
-requirejs(["material", "cookie", "jquery", "base"], function(mdc, Cookies) {
-	console.log(mdc);
-	
+requirejs(["material", "cookie", "moment", "jquery", "base"], function(mdc, Cookies, moment) {
+	// console.log(mdc);
+
 	const dialogs = mdc.dataTable.MDCDataTable.attachTo(document.getElementById('dialogs_table'));
-	
+
 	const addDialog = mdc.dialog.MDCDialog.attachTo(document.getElementById('add_dialog_dialog'));
 
 	const deleteDialog = mdc.dialog.MDCDialog.attachTo(document.getElementById('confirm_delete_dialog'));
@@ -31,12 +32,12 @@ requirejs(["material", "cookie", "jquery", "base"], function(mdc, Cookies) {
 	const lockDialog = mdc.dialog.MDCDialog.attachTo(document.getElementById('lock_delete_dialog'));
 
 	const addDialogName = mdc.textField.MDCTextField.attachTo(document.getElementById('new_dialog_name'));
-	
+
 	$("#fab_add_dialog").click(function(eventObj) {
 		addDialogName.value = '';
-		
+
 		$("#new_dialog_clone_id").val("");
-		
+
 		addDialog.open();
 	});
 
@@ -44,7 +45,7 @@ requirejs(["material", "cookie", "jquery", "base"], function(mdc, Cookies) {
 		addDialogName.value = $(eventObj.target).data()['cloneName'];
 
 		$("#new_dialog_clone_id").val($(eventObj.target).data()['cloneId']);
-		
+
 		addDialog.open();
 	});
 
@@ -61,61 +62,94 @@ requirejs(["material", "cookie", "jquery", "base"], function(mdc, Cookies) {
 
 	deleteDialog.listen('MDCDialog:closed', function(event) {
 		action = event.detail['action'];
-		
+
 		if (action == 'close') {
-		
+
 		} else if (action == 'delete') {
 			var deleteId = $("#delete_dialog_id").val();
 
 			$.post('/dashboard/delete', {
 				'identifier': deleteId
 			}, function(data) {
-				 location.reload(); 
+				 location.reload();
 			});
 		}
 	});
 
 	addDialog.listen('MDCDialog:closed', function(event) {
 		action = event.detail['action'];
-		
+
 		if (action == 'close') {
-		
+
 		} else if (action == 'create') {
 			var cloneId = $("#new_dialog_clone_id").val();
-			
+
 			$.post('/dashboard/create', {
 				'name': addDialogName.value,
 				'identifier': cloneId
 			}, function(data) {
-				 location.reload(); 
+				 location.reload();
 			});
 		}
 	});
 
-	const startDialog = mdc.dialog.MDCDialog.attachTo(document.getElementById('start_dialog_dialog'));
+	const scheduleDialog = mdc.dialog.MDCDialog.attachTo(document.getElementById('schedule_dialog'))
 
-	const startDestination = mdc.textField.MDCTextField.attachTo(document.getElementById('session_destination'));
+	const dateField = mdc.textField.MDCTextField.attachTo(document.getElementById('start_date'))
+	const phoneField = mdc.textField.MDCTextField.attachTo(document.getElementById('dialog_phone_number'))
+	const internalMinutesField = mdc.textField.MDCTextField.attachTo(document.getElementById('dialog_spacing_internal_minutes'))
+	const interruptMinutesField = mdc.textField.MDCTextField.attachTo(document.getElementById('dialog_interrupt_minutes'))
+	const timeoutsField = mdc.textField.MDCTextField.attachTo(document.getElementById('dialog_spacing_internal_timeouts'))
+	const dialogVariablesField = mdc.textField.MDCTextField.attachTo(document.getElementById('dialog_variables'))
 
-	startDialog.listen('MDCDialog:closed', function(event) {
-		action = event.detail['action'];
-		
-		if (action == 'close') {
-		
-		} else if (action == 'start') {
-			var startId = $("#start_dialog_id").val();
-			
-			$.post('/dashboard/start', {
-				'destination': startDestination.value,
-				'identifier': startId
-			});
+	scheduleDialog.listen('MDCDialog:closed', function (event) {
+	  const action = event.detail.action
+
+	  if (action === 'close') {
+		// Do nothing - just close
+	  } else if (action === 'schedule') {
+		const identifier = $('#schedule_identifier').val()
+
+		const payload = {
+		  identifier: identifier,
+		  date: dateField.value,
+		  interrupt_minutes: interruptMinutesField.value,
+		  pause_minutes: internalMinutesField.value,
+		  timeout_minutes: timeoutsField.value,
+		  dialog_variables: dialogVariablesField.value,
+		  phone: phoneField.value
 		}
-	});
+
+		$.post('/dashboard/schedule', payload, function (data) {
+			if (data.message !== undefined) {
+				alert(data.message)
+			}
+		})
+	  }
+	})
 
 	$(".dialog_start_button").click(function(eventObj) {
-		startDestination.value = '';
+		const identifier = $(this).attr('data-start-id')
 
-		$("#start_dialog_id").val($(eventObj.target).data()['startId']);
-		
-		startDialog.open();
+		dateField.value = moment().format('YYYY-MM-DDTHH:mm')
+		interruptMinutesField.value = ''
+		internalMinutesField.value = ''
+		timeoutsField.value = ''
+		phoneField.value = ''
+
+		$('#schedule_identifier').val(identifier)
+
+		scheduleDialog.open()
 	});
+
+	const pageSizeSelect = mdc.select.MDCSelect.attachTo(document.querySelector('.mdc-data-table__pagination-rows-per-page-select--outlined'))
+
+	pageSizeSelect.listen('MDCSelect:change', () => {
+	  const searchParams = new URLSearchParams(window.location.search)
+
+	  searchParams.set('size', pageSizeSelect.value)
+	  searchParams.delete('page')
+
+	  window.location = 'dialogs?' + searchParams.toString()
+	})
 });

@@ -6,6 +6,7 @@
 
         <link rel="stylesheet" href="{% static 'dashboard/js/vendor/material-components-web-11.0.0.css' %}" />
         <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+        <link rel="icon" type="image/x-icon" href="{% static 'dashboard/favicon/favicon.ico' %}">
 
         <title>{% block 'page_title' %}SMS Dashboard{% endblock %}</title>
 
@@ -35,11 +36,11 @@
             .mdc-top-app-bar {
                 z-index: 7;
             }
-            
+
             a {
                 text-decoration: none;
             }
-            
+
             .floating-action-button {
                 position: absolute;
                 bottom: 16px;
@@ -102,7 +103,7 @@
                 {% endblock %}
             </main>
         </div>
-        
+
         <div class="mdc-dialog" role="alertdialog" aria-modal="true" aria-labelledby="dialog-title" aria-describedby="dialog-content" id="base-dialog">
             <div class="mdc-dialog__container">
                 <div class="mdc-dialog__surface">
@@ -119,7 +120,7 @@
             </div>
             <div class="mdc-dialog__scrim"></div>
         </div>
-        
+
         {% block 'js_init' %}
             <!-- <script data-main="{% static 'builder-js/js/app/home.js' %}" src="{% static 'builder-js/vendor/require.js' %}"></script> -->
         {% endblock %}

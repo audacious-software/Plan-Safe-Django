@@ -6,7 +6,7 @@
 	<div class="mdc-layout-grid">
 		<div class="mdc-layout-grid__inner">
 			<div class="mdc-layout-grid__cell">
-				<div class="mdc-data-table" id="dialogs_table">
+				<div class="mdc-data-table" id="dialogs_table" style="margin-bottom: 64px;">
 					<div class="mdc-data-table__table-container">
 						<table class="mdc-data-table__table" aria-label="Dessert calories">
 							<thead>
@@ -56,17 +56,23 @@
 						</table>
 					</div>
 
+
 					<div class="mdc-data-table__pagination">
 						<div class="mdc-data-table__pagination-trailing">
 							<div class="mdc-data-table__pagination-rows-per-page">
 								<div class="mdc-data-table__pagination-rows-per-page-label">
-									Dialogs per page
+									Dialog scripts per page
 								</div>
-
-								<div class="mdc-select mdc-select--outlined mdc-select--no-label mdc-data-table__pagination-rows-per-page-select">
+								<div class="mdc-select mdc-select--outlined mdc-select--no-label mdc-data-table__pagination-rows-per-page-select mdc-data-table__pagination-rows-per-page-select--outlined">
 									<div class="mdc-select__anchor" role="button" aria-haspopup="listbox" aria-labelledby="demo-pagination-select" tabindex="0">
 										<span class="mdc-select__selected-text-container">
-											<span id="demo-pagination-select" class="mdc-select__selected-text">10</span>
+											<span id="demo-pagination-select" class="mdc-select__selected-text">
+												{% if size == -1 %}
+													All
+												{% else %}
+													{{ size }}
+												{% endif %}
+											</span>
 										</span>
 										<span class="mdc-select__dropdown-icon">
 											<svg class="mdc-select__dropdown-icon-graphic" viewBox="7 10 10 5">
@@ -82,14 +88,35 @@
 
 									<div class="mdc-select__menu mdc-menu mdc-menu-surface mdc-menu-surface--fullwidth" role="listbox">
 										<ul class="mdc-list">
-											<li class="mdc-list-item mdc-list-item--selected" aria-selected="true" role="option" data-value="10">
-												<span class="mdc-list-item__text">10</span>
+											<li class="mdc-select__option mdc-select__one-line-option mdc-list-item {% if size == 10 %}mdc-list-item--selected{% endif %} mdc-list-item--with-one-line" {% if size == 10 %}aria-selected="true"{% endif %} role="option" data-value="10">
+												<span class="mdc-list-item__ripple"></span>
+												<span class="mdc-list-item__content">
+													<span class="mdc-list-item__primary-text">10</span>
+												</span>
 											</li>
-											<li class="mdc-list-item" role="option" data-value="25">
-												<span class="mdc-list-item__text">25</span>
+											<li class="mdc-select__option mdc-select__one-line-option mdc-list-item {% if size == 25 %}mdc-list-item--selected{% endif %} mdc-list-item--with-one-line" {% if size == 25 %}aria-selected="true"{% endif %} role="option" data-value="25">
+												<span class="mdc-list-item__ripple"></span>
+												<span class="mdc-list-item__content">
+													<span class="mdc-list-item__primary-text">25</span>
+												</span>
 											</li>
-											<li class="mdc-list-item" role="option" data-value="100">
-												<span class="mdc-list-item__text">100</span>
+											<li class="mdc-select__option mdc-select__one-line-option mdc-list-item {% if size == 50 %}mdc-list-item--selected{% endif %} mdc-list-item--with-one-line" {% if size == 50 %}aria-selected="true"{% endif %} role="option" data-value="50">
+												<span class="mdc-list-item__ripple"></span>
+												<span class="mdc-list-item__content">
+													<span class="mdc-list-item__primary-text">50</span>
+												</span>
+											</li>
+											<li class="mdc-select__option mdc-select__one-line-option mdc-list-item {% if size == 100 %}mdc-list-item--selected{% endif %} mdc-list-item--with-one-line" {% if size == 100 %}aria-selected="true"{% endif %} role="option" data-value="100">
+												<span class="mdc-list-item__ripple"></span>
+												<span class="mdc-list-item__content">
+													<span class="mdc-list-item__primary-text">100</span>
+												</span>
+											</li>
+											<li class="mdc-select__option mdc-select__one-line-option mdc-list-item {% if size == -1 %}mdc-list-item--selected{% endif %} mdc-list-item--with-one-line" {% if size == -1 %}aria-selected="true"{% endif %} role="option" data-value="-1">
+												<span class="mdc-list-item__ripple"></span>
+												<span class="mdc-list-item__content">
+													<span class="mdc-list-item__primary-text">All</span>
+												</span>
 											</li>
 										</ul>
 									</div>
@@ -98,20 +125,32 @@
 
 							<div class="mdc-data-table__pagination-navigation">
 								<div class="mdc-data-table__pagination-total">
-									1‑10 of 100
+									{{ start_item }} ‑ {{ end_item }} of {{ total }}
 								</div>
-								<button class="mdc-icon-button material-icons mdc-data-table__pagination-button" data-first-page="true" disabled>
+								<a href="{{ first_page }}" class="mdc-icon-button material-icons mdc-data-table__pagination-button" data-first-page="true">
 									<div class="mdc-button__icon">first_page</div>
-								</button>
-								<button class="mdc-icon-button material-icons mdc-data-table__pagination-button" data-prev-page="true" disabled>
-									<div class="mdc-button__icon">chevron_left</div>
-								</button>
-								<button class="mdc-icon-button material-icons mdc-data-table__pagination-button" data-next-page="true">
-									<div class="mdc-button__icon">chevron_right</div>
-								</button>
-								<button class="mdc-icon-button material-icons mdc-data-table__pagination-button" data-last-page="true">
+								</a>
+								{% if previous_page %}
+									<a href="{{ previous_page }}" class="mdc-icon-button material-icons mdc-data-table__pagination-button" data-prev-page="true">
+										<div class="mdc-button__icon">chevron_left</div>
+									</a>
+								{% else %}
+									<button class="mdc-icon-button material-icons mdc-data-table__pagination-button" data-prev-page="true" disabled>
+										<div class="mdc-button__icon">chevron_left</div>
+									</button>
+								{% endif %}
+								{% if next_page %}
+									<a href="{{ next_page }}" class="mdc-icon-button material-icons mdc-data-table__pagination-button" data-next-page="true">
+										<div class="mdc-button__icon">chevron_right</div>
+									</a>
+								{% else %}
+									<button class="mdc-icon-button material-icons mdc-data-table__pagination-button" data-next-page="true" disabled>
+										<div class="mdc-button__icon">chevron_right</div>
+									</button>
+								{% endif %}
+								<a href="{{ last_page }}" class="mdc-icon-button material-icons mdc-data-table__pagination-button">
 									<div class="mdc-button__icon">last_page</div>
-								</button>
+								</a>
 							</div>
 						</div>
 					</div>
@@ -171,7 +210,7 @@
 					</h2>
 				</div>
 				<div class="mdc-dialog__content" id="delete-dialog-content" style="padding-top: 20px;">
-					<span class="mdc-typography mdc-typography--body1">Are you sure you want to delete <strong id="delete_dialog_name">XXX</strong>? 
+					<span class="mdc-typography mdc-typography--body1">Are you sure you want to delete <strong id="delete_dialog_name">XXX</strong>?
 					<input type="hidden" id="delete_dialog_id">
 				</div>
 				<div class="mdc-dialog__actions">
@@ -249,6 +288,118 @@
 		</div>
 		<div class="mdc-dialog__scrim"></div>
 	</div>
+
+	<div class="mdc-dialog" id="schedule_dialog">
+		<div class="mdc-dialog__container">
+			<div class="mdc-dialog__surface" style="min-width: 720px" role="dialog" aria-modal="true" aria-labelledby="schedule-title" aria-describedby="schedule-content">
+				<div class="mdc-dialog__header">
+					<h2 class="mdc-dialog__title" id="schedule-title">
+						Schedule dialog
+					</h2>
+				</div>
+				<div class="mdc-dialog__content" id="schedule-content" style="padding-top: 20px;">
+					<input type="hidden" id="schedule_identifier" value="">
+					<div class="mdc-layout-grid" style="padding: 0px;">
+						<div class="mdc-layout-grid__inner">
+							<div class="mdc-layout-grid__cell--span-6">
+								<label class="mdc-text-field mdc-text-field--outlined" id="start_date" style="width: 100%;">
+									<span class="mdc-notched-outline">
+										<span class="mdc-notched-outline__leading"></span>
+										<span class="mdc-notched-outline__notch">
+											<span class="mdc-floating-label" id="start_date_label">Start date &amp; time</span>
+										</span>
+										<span class="mdc-notched-outline__trailing"></span>
+									</span>
+									<input type="datetime-local" class="mdc-text-field__input" aria-labelledby="start_date_label">
+								</label>
+							</div>
+							<div class="mdc-layout-grid__cell--span-6">
+								<label class="mdc-text-field mdc-text-field--outlined" id="dialog_phone_number" style="width: 100%;">
+									<span class="mdc-notched-outline">
+										<span class="mdc-notched-outline__leading"></span>
+										<span class="mdc-notched-outline__notch">
+											<span class="mdc-floating-label" id="dialog_phone_number_label">Mobile Phone Number</span>
+										</span>
+										<span class="mdc-notched-outline__trailing"></span>
+									</span>
+									<input type="text" class="mdc-text-field__input" aria-labelledby="dialog_phone_number_label">
+								</label>
+							</div>
+							<div class="mdc-layout-grid__cell--span-4">
+								<label class="mdc-text-field mdc-text-field--outlined" id="dialog_interrupt_minutes" style="width: 100%;">
+									<span class="mdc-notched-outline">
+										<span class="mdc-notched-outline__leading"></span>
+										<span class="mdc-notched-outline__notch">
+											<span class="mdc-floating-label" id="dialog_interrupt_minutes_label">Timed Interrupts</span>
+										</span>
+										<span class="mdc-notched-outline__trailing"></span>
+									</span>
+									<input type="number" min="1" step="1" class="mdc-text-field__input" aria-labelledby="dialog_interrupt_minutes_label">
+								</label>
+							</div>
+							<div class="mdc-layout-grid__cell--span-4">
+								<label class="mdc-text-field mdc-text-field--outlined" id="dialog_spacing_internal_minutes" style="width: 100%;">
+									<span class="mdc-notched-outline">
+										<span class="mdc-notched-outline__leading"></span>
+										<span class="mdc-notched-outline__notch">
+											<span class="mdc-floating-label" id="dialog_spacing_internal_minutes_label">Internal Pauses</span>
+										</span>
+										<span class="mdc-notched-outline__trailing"></span>
+									</span>
+									<input type="number" min="1" step="1" class="mdc-text-field__input" aria-labelledby="dialog_spacing_internal_minutes_label">
+								</label>
+							</div>
+							<div class="mdc-layout-grid__cell--span-4">
+								<label class="mdc-text-field mdc-text-field--outlined" id="dialog_spacing_internal_timeouts" style="width: 100%;">
+									<span class="mdc-notched-outline">
+										<span class="mdc-notched-outline__leading"></span>
+										<span class="mdc-notched-outline__notch">
+											<span class="mdc-floating-label" id="dialog_spacing_internal_timeouts_label">Timeouts</span>
+										</span>
+										<span class="mdc-notched-outline__trailing"></span>
+									</span>
+									<input type="number" min="1" step="1" class="mdc-text-field__input" aria-labelledby="dialog_spacing_internal_timeouts_label">
+								</label>
+							</div>
+							<div class="mdc-layout-grid__cell--span-12 mdc-typography--caption" style="margin-top: -1em;">
+								All units above in minutes. Leave empty to use original values encoded in the dialog scripts.
+							</div>
+							<div class="mdc-layout-grid__cell--span-12">
+								<label class="mdc-text-field mdc-text-field--outlined mdc-text-field--textarea" id="dialog_variables" style="width: 100%;">
+									<span class="mdc-notched-outline">
+										<span class="mdc-notched-outline__leading"></span>
+										<span class="mdc-notched-outline__notch">
+											<span class="mdc-floating-label" id="dialog_variables_label">Dialog Variables</span>
+										</span>
+										<span class="mdc-notched-outline__trailing"></span>
+									</span>
+									<span class="mdc-text-field__resizer">
+										<textarea class="mdc-text-field__input" rows="4" aria-label="Dialog Variables" aria-labelledby="dialog_variables_label">{{ dialog_variables }}</textarea>
+									</span>
+								</label>
+							</div>
+							<div class="mdc-layout-grid__cell--span-12 mdc-typography--caption" style="margin-top: -1em;">
+								Enter as KEY=VALUE pairs, one variable per line.
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="mdc-dialog__actions">
+					<button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="close">
+						<div class="mdc-button__ripple"></div>
+						<span class="mdc-button__label">Cancel</span>
+					</button>
+					<button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="schedule" data-mdc-dialog-button-default>
+						<div class="mdc-button__ripple"></div>
+						<span class="mdc-button__label">Schedule</span>
+					</button>
+				</div>
+			</div>
+		</div>
+		<div class="mdc-dialog__scrim"></div>
+	</div>
+
 
 {% endblock %}
 {% block 'js_init' %}
