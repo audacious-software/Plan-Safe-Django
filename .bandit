@@ -1,0 +1,2 @@
+[bandit]
+exclude = ./sms_site/local_settings.py,./node_modules
