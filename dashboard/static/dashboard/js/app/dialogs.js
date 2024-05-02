@@ -1,155 +1,157 @@
+/* global requirejs, alert */
+
 requirejs.config({
-    shim: {
-        jquery: {
-            exports: "$"
-        },
-        cookie: {
-            exports: "Cookies"
-        },
-        bootstrap: {
-            deps: ["jquery"]
-        },
+  shim: {
+    jquery: {
+      exports: '$'
     },
-    baseUrl: "/static/dashboard/js/app",
-    paths: {
-        app: '/static/dashboard/js/app',
-        material: "/static/dashboard/js/vendor/material-components-web-11.0.0",
-        jquery: "/static/dashboard/js/vendor/jquery-3.4.0.min",
-        cookie: "/static/dashboard/js/vendor/js.cookie",
-		moment: '/static/dashboard/js/vendor/moment-with-locales'
-	}
-});
+    cookie: {
+      exports: 'Cookies'
+    },
+    bootstrap: {
+      deps: ['jquery']
+    }
+  },
+  baseUrl: '/static/dashboard/js/app',
+  paths: {
+    app: '/static/dashboard/js/app',
+    material: '/static/dashboard/js/vendor/material-components-web-11.0.0',
+    jquery: '/static/dashboard/js/vendor/jquery-3.4.0.min',
+    cookie: '/static/dashboard/js/vendor/js.cookie',
+    moment: '/static/dashboard/js/vendor/moment-with-locales'
+  }
+})
 
-requirejs(["material", "cookie", "moment", "jquery", "base"], function(mdc, Cookies, moment) {
-	// console.log(mdc);
+requirejs(['material', 'cookie', 'moment', 'jquery', 'base'], function (mdc, Cookies, moment) {
+  // console.log(mdc);
 
-	const dialogs = mdc.dataTable.MDCDataTable.attachTo(document.getElementById('dialogs_table'));
+  mdc.dataTable.MDCDataTable.attachTo(document.getElementById('dialogs_table'))
 
-	const addDialog = mdc.dialog.MDCDialog.attachTo(document.getElementById('add_dialog_dialog'));
+  const addDialog = mdc.dialog.MDCDialog.attachTo(document.getElementById('add_dialog_dialog'))
 
-	const deleteDialog = mdc.dialog.MDCDialog.attachTo(document.getElementById('confirm_delete_dialog'));
+  const deleteDialog = mdc.dialog.MDCDialog.attachTo(document.getElementById('confirm_delete_dialog'))
 
-	const lockDialog = mdc.dialog.MDCDialog.attachTo(document.getElementById('lock_delete_dialog'));
+  const lockDialog = mdc.dialog.MDCDialog.attachTo(document.getElementById('lock_delete_dialog'))
 
-	const addDialogName = mdc.textField.MDCTextField.attachTo(document.getElementById('new_dialog_name'));
+  const addDialogName = mdc.textField.MDCTextField.attachTo(document.getElementById('new_dialog_name'))
 
-	$("#fab_add_dialog").click(function(eventObj) {
-		addDialogName.value = '';
+  $('#fab_add_dialog').click(function (eventObj) {
+    addDialogName.value = ''
 
-		$("#new_dialog_clone_id").val("");
+    $('#new_dialog_clone_id').val('')
 
-		addDialog.open();
-	});
+    addDialog.open()
+  })
 
-	$(".dialog_clone_button").click(function(eventObj) {
-		addDialogName.value = $(eventObj.target).data()['cloneName'];
+  $('.dialog_clone_button').click(function (eventObj) {
+    addDialogName.value = $(eventObj.target).data().cloneName
 
-		$("#new_dialog_clone_id").val($(eventObj.target).data()['cloneId']);
+    $('#new_dialog_clone_id').val($(eventObj.target).data().cloneId)
 
-		addDialog.open();
-	});
+    addDialog.open()
+  })
 
-	$(".dialog_delete_button").click(function(eventObj) {
-		$("#delete_dialog_name").text($(eventObj.target).data()["deleteName"]);
-		$("#delete_dialog_id").val($(eventObj.target).data()["deleteId"]);
+  $('.dialog_delete_button').click(function (eventObj) {
+    $('#delete_dialog_name').text($(eventObj.target).data().deleteName)
+    $('#delete_dialog_id').val($(eventObj.target).data().deleteId)
 
-		deleteDialog.open()
-	});
+    deleteDialog.open()
+  })
 
-	$(".dialog_lock_button").click(function(eventObj) {
-		lockDialog.open();
-	});
+  $('.dialog_lock_button').click(function (eventObj) {
+    lockDialog.open()
+  })
 
-	deleteDialog.listen('MDCDialog:closed', function(event) {
-		action = event.detail['action'];
+  deleteDialog.listen('MDCDialog:closed', function (event) {
+    const action = event.detail.action
 
-		if (action == 'close') {
+    if (action === 'close') {
+      // Do nothing
+    } else if (action === 'delete') {
+      const deleteId = $('#delete_dialog_id').val()
 
-		} else if (action == 'delete') {
-			var deleteId = $("#delete_dialog_id").val();
+      $.post('/dashboard/delete', {
+        identifier: deleteId
+      }, function (data) {
+        window.location.reload()
+      })
+    }
+  })
 
-			$.post('/dashboard/delete', {
-				'identifier': deleteId
-			}, function(data) {
-				 location.reload();
-			});
-		}
-	});
+  addDialog.listen('MDCDialog:closed', function (event) {
+    const action = event.detail.action
 
-	addDialog.listen('MDCDialog:closed', function(event) {
-		action = event.detail['action'];
+    if (action === 'close') {
+      // Do nothing
+    } else if (action === 'create') {
+      const cloneId = $('#new_dialog_clone_id').val()
 
-		if (action == 'close') {
+      $.post('/dashboard/create', {
+        name: addDialogName.value,
+        identifier: cloneId
+      }, function (data) {
+        window.location.reload()
+      })
+    }
+  })
 
-		} else if (action == 'create') {
-			var cloneId = $("#new_dialog_clone_id").val();
+  const scheduleDialog = mdc.dialog.MDCDialog.attachTo(document.getElementById('schedule_dialog'))
 
-			$.post('/dashboard/create', {
-				'name': addDialogName.value,
-				'identifier': cloneId
-			}, function(data) {
-				 location.reload();
-			});
-		}
-	});
+  const dateField = mdc.textField.MDCTextField.attachTo(document.getElementById('start_date'))
+  const phoneField = mdc.textField.MDCTextField.attachTo(document.getElementById('dialog_phone_number'))
+  const internalMinutesField = mdc.textField.MDCTextField.attachTo(document.getElementById('dialog_spacing_internal_minutes'))
+  const interruptMinutesField = mdc.textField.MDCTextField.attachTo(document.getElementById('dialog_interrupt_minutes'))
+  const timeoutsField = mdc.textField.MDCTextField.attachTo(document.getElementById('dialog_spacing_internal_timeouts'))
+  const dialogVariablesField = mdc.textField.MDCTextField.attachTo(document.getElementById('dialog_variables'))
 
-	const scheduleDialog = mdc.dialog.MDCDialog.attachTo(document.getElementById('schedule_dialog'))
+  scheduleDialog.listen('MDCDialog:closed', function (event) {
+    const action = event.detail.action
 
-	const dateField = mdc.textField.MDCTextField.attachTo(document.getElementById('start_date'))
-	const phoneField = mdc.textField.MDCTextField.attachTo(document.getElementById('dialog_phone_number'))
-	const internalMinutesField = mdc.textField.MDCTextField.attachTo(document.getElementById('dialog_spacing_internal_minutes'))
-	const interruptMinutesField = mdc.textField.MDCTextField.attachTo(document.getElementById('dialog_interrupt_minutes'))
-	const timeoutsField = mdc.textField.MDCTextField.attachTo(document.getElementById('dialog_spacing_internal_timeouts'))
-	const dialogVariablesField = mdc.textField.MDCTextField.attachTo(document.getElementById('dialog_variables'))
+    if (action === 'close') {
+    // Do nothing - just close
+    } else if (action === 'schedule') {
+      const identifier = $('#schedule_identifier').val()
 
-	scheduleDialog.listen('MDCDialog:closed', function (event) {
-	  const action = event.detail.action
+      const payload = {
+        identifier: identifier,
+        date: dateField.value,
+        interrupt_minutes: interruptMinutesField.value,
+        pause_minutes: internalMinutesField.value,
+        timeout_minutes: timeoutsField.value,
+        dialog_variables: dialogVariablesField.value,
+        phone: phoneField.value
+      }
 
-	  if (action === 'close') {
-		// Do nothing - just close
-	  } else if (action === 'schedule') {
-		const identifier = $('#schedule_identifier').val()
+      $.post('/dashboard/schedule', payload, function (data) {
+        if (data.message !== undefined) {
+          alert(data.message)
+        }
+      })
+    }
+  })
 
-		const payload = {
-		  identifier: identifier,
-		  date: dateField.value,
-		  interrupt_minutes: interruptMinutesField.value,
-		  pause_minutes: internalMinutesField.value,
-		  timeout_minutes: timeoutsField.value,
-		  dialog_variables: dialogVariablesField.value,
-		  phone: phoneField.value
-		}
+  $('.dialog_start_button').click(function (eventObj) {
+    const identifier = $(this).attr('data-start-id')
 
-		$.post('/dashboard/schedule', payload, function (data) {
-			if (data.message !== undefined) {
-				alert(data.message)
-			}
-		})
-	  }
-	})
+    dateField.value = moment().format('YYYY-MM-DDTHH:mm')
+    interruptMinutesField.value = ''
+    internalMinutesField.value = ''
+    timeoutsField.value = ''
+    phoneField.value = ''
 
-	$(".dialog_start_button").click(function(eventObj) {
-		const identifier = $(this).attr('data-start-id')
+    $('#schedule_identifier').val(identifier)
 
-		dateField.value = moment().format('YYYY-MM-DDTHH:mm')
-		interruptMinutesField.value = ''
-		internalMinutesField.value = ''
-		timeoutsField.value = ''
-		phoneField.value = ''
+    scheduleDialog.open()
+  })
 
-		$('#schedule_identifier').val(identifier)
+  const pageSizeSelect = mdc.select.MDCSelect.attachTo(document.querySelector('.mdc-data-table__pagination-rows-per-page-select--outlined'))
 
-		scheduleDialog.open()
-	});
+  pageSizeSelect.listen('MDCSelect:change', () => {
+    const searchParams = new URLSearchParams(window.location.search)
 
-	const pageSizeSelect = mdc.select.MDCSelect.attachTo(document.querySelector('.mdc-data-table__pagination-rows-per-page-select--outlined'))
+    searchParams.set('size', pageSizeSelect.value)
+    searchParams.delete('page')
 
-	pageSizeSelect.listen('MDCSelect:change', () => {
-	  const searchParams = new URLSearchParams(window.location.search)
-
-	  searchParams.set('size', pageSizeSelect.value)
-	  searchParams.delete('page')
-
-	  window.location = 'dialogs?' + searchParams.toString()
-	})
-});
+    window.location = 'dialogs?' + searchParams.toString()
+  })
+})
