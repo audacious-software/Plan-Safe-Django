@@ -12,15 +12,19 @@ from django.conf import settings
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseRedirect
+from django.core.management import call_command
 from django.shortcuts import render
+from django.views.decorators.cache import never_cache
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.text import slugify
 
 from django_dialog_engine.models import DialogScript, Dialog
 
-from simple_messaging.models import IncomingMessage, OutgoingMessage
+from simple_messaging.models import IncomingMessage, OutgoingMessage, OutgoingMessageMedia
 from simple_messaging_dialog_support.models import DialogSession
+
+from plan_safe.models import Participant, TimeZone, StudyArm
 
 @login_required
 def dashboard_home(request):
@@ -196,9 +200,31 @@ def dashboard_start(request):
 def dashboard_schedule(request): # pylint: disable=too-many-locals
     if request.method == 'POST': # pylint: disable=too-many-nested-blocks
         identifier = request.POST.get('identifier', '')
-        interrupt_minutes = int(request.POST.get('interrupt_minutes', ''))
-        pause_minutes = int(request.POST.get('pause_minutes', ''))
-        timeout_minutes = int(request.POST.get('timeout_minutes', ''))
+
+        interrupt_minutes = None
+        interrupt_str = request.POST.get('interrupt_minutes', '-1')
+
+        try:
+            interrupt_minutes = float(interrupt_str)
+        except ValueError:
+            pass
+
+        pause_minutes = None
+        pause_str = request.POST.get('pause_minutes', '-1')
+
+        try:
+            pause_minutes = float(pause_str)
+        except ValueError:
+            pass
+
+        timeout_minutes = None
+        timeout_str = request.POST.get('timeout_minutes', '-1')
+
+        try:
+            timeout_minutes = float(timeout_str)
+        except ValueError:
+            pass
+
         dialog_variables = request.POST.get('dialog_variables', '').split('\n')
 
         request.session['dialog_variables'] = '\n'.join(dialog_variables)
@@ -222,11 +248,16 @@ def dashboard_schedule(request): # pylint: disable=too-many-locals
                 if script is not None:
                     message = 'dialog:%s' % script.identifier
 
-                    dialog_options = {
-                        'interrupt_minutes': interrupt_minutes,
-                        'pause_minutes': pause_minutes,
-                        'timeout_minutes': timeout_minutes
-                    }
+                    dialog_options = {}
+
+                    if interrupt_minutes is not None and interrupt_minutes < 0:
+                        dialog_options['interrupt_minutes'] = interrupt_minutes
+
+                    if timeout_minutes is not None and timeout_minutes < 0:
+                        dialog_options['timeout_minutes'] = timeout_minutes
+
+                    if pause_minutes is not None and pause_minutes < 0:
+                        dialog_options['pause_minutes'] = pause_minutes
 
                     for variable in dialog_variables:
                         pair = variable.split('=')
@@ -245,3 +276,207 @@ def dashboard_schedule(request): # pylint: disable=too-many-locals
         return HttpResponse(json.dumps(response_json, indent=2), content_type='application/json')
 
     return HttpResponseRedirect(reverse('dashboard_dialogs'))
+
+@login_required
+def dashboard_participants(request): # pylint: disable=too-many-locals, too-many-branches, too-many-statements
+    context = {
+    }
+
+    if request.method == 'POST':
+        identifier = request.POST.get('identifier', '')
+        phone_number = request.POST.get('phone_number', '')
+        personalized_name = request.POST.get('personalized_name', '')
+        time_zone = request.POST.get('time_zone', '')
+        study_arm = request.POST.get('study_arm', '')
+
+        if '' in [identifier, phone_number, personalized_name, time_zone, study_arm]:
+            response_json = {
+                'message': 'Please complete all the fields to proceed.',
+                'reload': False
+            }
+
+            return HttpResponse(json.dumps(response_json, indent=2), content_type='application/json')
+
+        try:
+            parsed = phonenumbers.parse(phone_number, settings.PHONE_REGION)
+
+            phone_number = phonenumbers.format_number(parsed, phonenumbers.PhoneNumberFormat.E164)
+        except: # pylint: disable=bare-except
+            response_json = {
+                'message': 'Phone number does not appear to be valid. Please re-enter and try again.',
+                'reload': False
+            }
+
+            return HttpResponse(json.dumps(response_json, indent=2), content_type='application/json')
+
+        participant = None
+
+        for test_participant in Participant.objects.all():
+            if test_participant.fetch_phone_number() == phone_number or test_participant.identifier == identifier:
+                participant = test_participant
+
+        if participant is None:
+            participant = Participant.objects.create(identifier=identifier, phone_number=phone_number, time_zone=TimeZone.objects.get(name=time_zone), study_arm=StudyArm.objects.get(identifier=study_arm), personalized_name=personalized_name)
+
+            response_json = {
+                'message': 'Participant enrolled successfully.',
+                'reload': True
+            }
+        else:
+            response_json = {
+                'message': 'Participant updated successfully.',
+                'reload': True
+            }
+
+            participant.identifier = identifier
+            participant.phone_number = phone_number
+            participant.time_zone = TimeZone.objects.get(name=time_zone)
+            participant.study_arm = StudyArm.objects.get(identifier=study_arm)
+            participant.personalized_name = personalized_name
+
+        participant.save()
+
+        return HttpResponse(json.dumps(response_json, indent=2), content_type='application/json')
+
+    search_query = request.GET.get('query', '')
+
+    query = Participant.objects.all()
+
+    study_arm = request.GET.get('study_arm', '')
+
+    if study_arm != '':
+        query = query.filter(study_arm__identifier=study_arm)
+
+    context['participants'] = list(query.order_by('identifier'))
+    context['selected_arm'] = study_arm
+
+    context['search_query'] = search_query
+
+    if search_query != '':
+        new_participants = []
+
+        for participant in context['participants']:
+            metadata = json.dumps(participant.metadata)
+
+            if search_query in metadata:
+                new_participants.append(participant)
+            elif search_query in str(participant.identifier):
+                new_participants.append(participant)
+            elif search_query in str(participant.phone_number):
+                new_participants.append(participant)
+            elif search_query in str(participant.personalized_name):
+                new_participants.append(participant)
+
+        context['participants'] = new_participants
+
+    context['total'] = len(context['participants'])
+
+    page = int(request.GET.get('page', '0'))
+    page_size = int(request.GET.get('size', '25'))
+
+    start_item = page_size * page
+
+    if page_size != -1:
+        context['participants'] = context['participants'][start_item:(start_item+page_size)]
+
+    context['current_page'] = page
+    context['pages'] = context['total'] / page_size
+    context['size'] = page_size
+
+    context['end_item'] = start_item + page_size
+
+    if page_size == -1:
+        context['current_page'] = 0
+        context['pages'] = 1
+
+        start_item = 0
+        context['end_item'] = context['total']
+
+    if context['end_item'] > context['total']:
+        context['end_item'] = context['total']
+
+    context['start_item'] = start_item + 1
+
+    base_url = reverse('dashboard_participants')
+
+    if page > 0:
+        context['previous_page'] = '%s?page=%s&size=%s' % (base_url, page - 1, page_size)
+
+    if context['total'] > (page + 1) * page_size:
+        context['next_page'] = '%s?page=%s&size=%s' % (base_url, page + 1, page_size)
+
+    context['first_page'] = '%s?page=%s&size=%s' % (base_url, 0, page_size)
+
+    context['last_page'] = '%s?page=%s&size=%s' % (base_url, context['total'] / page_size, page_size)
+
+    if page_size == -1:
+        context['last_page'] = '%s?page=%s&size=%s' % (base_url, 0, page_size)
+        del context['next_page']
+
+    if (context['total'] % page_size) != 0:
+        context['pages'] += 1
+
+    context['time_zones'] = TimeZone.objects.all().order_by('order')
+    context['study_arms'] = StudyArm.objects.all().order_by('name')
+
+    return render(request, 'dashboard_participants.html', context=context)
+
+@never_cache
+@login_required
+def dashboard_participants_broadcast(request): # pylint: disable=invalid-name
+    if request.method == 'POST':
+        identifiers = json.loads(request.POST.get('identifiers', '[]'))
+        message = request.POST.get('message', None)
+        when = request.POST.get('when', '')
+
+        if message is not None and message.strip() != '':
+            for identifier in identifiers:
+                participant = Participant.objects.filter(identifier=identifier).first()
+
+                when_send = timezone.now()
+
+                if when != '':
+                    when_send = pytz.timezone(settings.TIME_ZONE).localize(datetime.datetime.strptime(when, '%Y-%m-%dT%H:%M'))
+
+                if participant is not None:
+                    outgoing = OutgoingMessage.objects.create(destination=participant.fetch_phone_number(), send_date=when_send, message=message)
+                    outgoing.encrypt_destination()
+
+                    outgoing_files = []
+
+                    for key in request.FILES.keys():
+                        outgoing_files.append(request.FILES[key])
+
+                    index_counter = 0
+
+                    for outgoing_file in outgoing_files:
+                        media = OutgoingMessageMedia(message=outgoing)
+
+                        media.content_type = outgoing_file.content_type
+                        media.index = index_counter
+
+                        media.save()
+
+                        index_counter += 1
+
+                        media.content_file.save(outgoing_file.name, outgoing_file)
+
+            call_command('simple_messaging_send_pending_messages')
+
+            response_json = {
+                'message': 'Message broadcast scheduled.',
+                'reset': True,
+                'reload': False
+            }
+
+            return HttpResponse(json.dumps(response_json, indent=2), content_type='application/json')
+
+        response_json = {
+            'message': 'No message provided. None sent.',
+            'reset': True,
+            'reload': False
+        }
+
+        return HttpResponse(json.dumps(response_json, indent=2), content_type='application/json')
+
+    return HttpResponseRedirect(reverse('dashboard_participants'))

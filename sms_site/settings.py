@@ -36,10 +36,12 @@ INSTALLED_APPS = [
     'django_dialog_engine_builder',
     'nagios_monitor',
     'quicksilver',
+    'simple_dashboard',
     'simple_messaging',
     'simple_messaging_dialog_support',
     'simple_messaging_azure',
     'simple_messaging_twilio',
+    'plan_safe',
     'dashboard',
 ]
 
@@ -135,6 +137,7 @@ PHONE_REGION = 'US'
 SECURE_SSL_REDIRECT = True
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
+X_FRAME_OPTIONS = 'SAMEORIGIN'
 
 LOGIN_REDIRECT_URL = '/dashboard/'
 
@@ -142,5 +145,8 @@ DJANGO_DIALOG_ENGINE_TEMPLATE_LOADS = (
     'simple_messaging_dialog_support',
 )
 
+SILENCED_SYSTEM_CHECKS = []
+
 from .local_settings import *
 
+SILENCED_SYSTEM_CHECKS.append('security.W019')

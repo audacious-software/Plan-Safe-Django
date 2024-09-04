@@ -22,3 +22,6 @@
 [submodule "nagios_monitor"]
 	path = nagios_monitor
 	url = https://github.com/audacious-software/Django-Nagios-Monitoring.git
+[submodule "simple_dashboard"]
+	path = simple_dashboard
+	url = https://github.com/audacious-software/Simple-Dashboard-Django.git
