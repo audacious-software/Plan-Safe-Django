@@ -4,12 +4,12 @@ define(['material', 'cards/node', 'jquery'], function (mdc, Node) {
       let body = ''
 
       body += '<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">'
-      body += '<div class="mdc-select mdc-select--outlined" id="' + this.cardId + '_select_model" style="width: 100%">'
+      body += `<div class="mdc-select mdc-select--outlined" id="${this.cardId}_select_element" style="width: 100%">`
       body += '  <div class="mdc-select__anchor">'
       body += '    <span class="mdc-notched-outline">'
       body += '      <span class="mdc-notched-outline__leading"></span>'
       body += '      <span class="mdc-notched-outline__notch">'
-      body += '        <span id="outlined-select-label" class="mdc-floating-label">Selected Model</span>'
+      body += '        <span id="outlined-select-label" class="mdc-floating-label">Selected Element</span>'
       body += '      </span>'
       body += '      <span class="mdc-notched-outline__trailing"></span>'
       body += '    </span>'
@@ -24,45 +24,177 @@ define(['material', 'cards/node', 'jquery'], function (mdc, Node) {
       body += '    </span>'
       body += '  </div>'
       body += '  <div class="mdc-select__menu mdc-menu mdc-menu-surface mdc-menu-surface--fullwidth">'
-      body += '    <ul class="mdc-list" role="listbox" aria-label=Selected Model" id="' + this.cardId + '_model_list">'
-      //            body += '      <li class="mdc-list-item" aria-selected="false" data-value="GET" role="option">';
-      //            body += '        <span class="mdc-list-item__ripple"></span>';
-      //            body += '        <span class="mdc-list-item__text">GET</span>';
-      //            body += '      </li>';
+      body += `    <ul class="mdc-list" role="listbox" aria-label=Selected Element" id="${this.cardId}_element_list">`
+      body += '      <li class="mdc-list-item" aria-selected="false" data-value="warning-signs" role="option">';
+      body += '        <span class="mdc-list-item__ripple"></span>';
+      body += '        <span class="mdc-list-item__text">Warning Signs</span>';
+      body += '      </li>';
+      body += '      <li class="mdc-list-item" aria-selected="false" data-value="coping-skills" role="option">';
+      body += '        <span class="mdc-list-item__ripple"></span>';
+      body += '        <span class="mdc-list-item__text">Coping Skills</span>';
+      body += '      </li>';
+      body += '      <li class="mdc-list-item" aria-selected="false" data-value="people-distraction" role="option">';
+      body += '        <span class="mdc-list-item__ripple"></span>';
+      body += '        <span class="mdc-list-item__text">People For Distraction</span>';
+      body += '      </li>';
+      body += '      <li class="mdc-list-item" aria-selected="false" data-value="people-help" role="option">';
+      body += '        <span class="mdc-list-item__ripple"></span>';
+      body += '        <span class="mdc-list-item__text">People For Help</span>';
+      body += '      </li>';
+      body += '      <li class="mdc-list-item" aria-selected="false" data-value="crisis-helplines" role="option">';
+      body += '        <span class="mdc-list-item__ripple"></span>';
+      body += '        <span class="mdc-list-item__text">Crisis Help Lines</span>';
+      body += '      </li>';
+      body += '      <li class="mdc-list-item" aria-selected="false" data-value="provider-medical" role="option">';
+      body += '        <span class="mdc-list-item__ripple"></span>';
+      body += '        <span class="mdc-list-item__text">Medical Provider</span>';
+      body += '      </li>';
+      body += '      <li class="mdc-list-item" aria-selected="false" data-value="provider-mental-health" role="option">';
+      body += '        <span class="mdc-list-item__ripple"></span>';
+      body += '        <span class="mdc-list-item__text">Mental Health Provider</span>';
+      body += '      </li>';
+      body += '      <li class="mdc-list-item" aria-selected="false" data-value="environmental-safety" role="option">';
+      body += '        <span class="mdc-list-item__ripple"></span>';
+      body += '        <span class="mdc-list-item__text">Environmental Safety</span>';
+      body += '      </li>';
+      body += '      <li class="mdc-list-item" aria-selected="false" data-value="reasons-for-living" role="option">';
+      body += '        <span class="mdc-list-item__ripple"></span>';
+      body += '        <span class="mdc-list-item__text">Reasons For Living</span>';
+      body += '      </li>';
       body += '    </ul>'
       body += '  </div>'
       body += '</div>'
       body += '</div>'
 
       body += '<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">'
-      body += '  <label class="mdc-text-field mdc-text-field--outlined mdc-text-field--textarea" id="' + this.cardId + '_prompt_field" style="width: 100%">'
+      body += `<div class="mdc-select mdc-select--outlined" id="${this.cardId}_select_operation" style="width: 100%">`
+      body += '  <div class="mdc-select__anchor">'
+      body += '    <span class="mdc-notched-outline">'
+      body += '      <span class="mdc-notched-outline__leading"></span>'
+      body += '      <span class="mdc-notched-outline__notch">'
+      body += '        <span id="outlined-select-label" class="mdc-floating-label">Operation</span>'
+      body += '      </span>'
+      body += '      <span class="mdc-notched-outline__trailing"></span>'
+      body += '    </span>'
+      body += '    <span class="mdc-select__selected-text-container">'
+      body += '      <span class="mdc-select__selected-text"></span>'
+      body += '    </span>'
+      body += '    <span class="mdc-select__dropdown-icon">'
+      body += '      <svg class="mdc-select__dropdown-icon-graphic" viewBox="7 10 10 5" focusable="false">'
+      body += '        <polygon class="mdc-select__dropdown-icon-inactive" stroke="none" fill-rule="evenodd" points="7 10 12 15 17 10"></polygon>'
+      body += '        <polygon class="mdc-select__dropdown-icon-active" stroke="none" fill-rule="evenodd" points="7 15 12 10 17 15"></polygon>'
+      body += '      </svg>'
+      body += '    </span>'
+      body += '  </div>'
+      body += '  <div class="mdc-select__menu mdc-menu mdc-menu-surface mdc-menu-surface--fullwidth">'
+      body += `    <ul class="mdc-list" role="listbox" aria-label=Selected Element" id="${this.cardId}_operation_list">`
+      body += '      <li class="mdc-list-item" aria-selected="false" data-value="operation-add" role="option">';
+      body += '        <span class="mdc-list-item__ripple"></span>';
+      body += '        <span class="mdc-list-item__text">Add To&#8230;</span>';
+      body += '      </li>';
+      body += '      <li class="mdc-list-item" aria-selected="false" data-value="operation-remove" role="option">';
+      body += '        <span class="mdc-list-item__ripple"></span>';
+      body += '        <span class="mdc-list-item__text">Remove From&#8230;</span>';
+      body += '      </li>';
+      body += '      <li class="mdc-list-item" aria-selected="false" data-value="operation-reset" role="option">';
+      body += '        <span class="mdc-list-item__ripple"></span>';
+      body += '        <span class="mdc-list-item__text">Reset</span>';
+      body += '      </li>';
+      body += '    </ul>'
+      body += '  </div>'
+      body += '</div>'
+      body += '</div>'
+
+      body += '<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">'
+      body += `  <label class="mdc-text-field mdc-text-field--outlined mdc-text-field--textarea" id="${this.cardId}_contact_name_field" style="width: 100%">`
       body += '    <span class="mdc-notched-outline">'
       body += '      <span class="mdc-notched-outline__leading"></span>'
       body += '      <div class="mdc-notched-outline__notch">'
-      body += '        <label for="' + this.cardId + '_prompt_value" class="mdc-floating-label">Generative AI Prompt</label>'
+      body += `        <label for="${this.cardId}_message_value" class="mdc-floating-label">Contact Name</label>`
+      body += '      </div>'
+      body += '      <span class="mdc-notched-outline__trailing"></span>'
+      body += '    </span>'
+      body += `    <input type="text" class="mdc-text-field__input" style="width: 100%" id="${this.cardId}_contact_name_value" />`
+      body += '  </label>'
+      body += '</div>'
+
+      body += '<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">'
+      body += `  <label class="mdc-text-field mdc-text-field--outlined mdc-text-field--textarea" id="${this.cardId}_phone_field" style="width: 100%">`
+      body += '    <span class="mdc-notched-outline">'
+      body += '      <span class="mdc-notched-outline__leading"></span>'
+      body += '      <div class="mdc-notched-outline__notch">'
+      body += `        <label for="${this.cardId}_message_value" class="mdc-floating-label">Phone Number</label>`
+      body += '      </div>'
+      body += '      <span class="mdc-notched-outline__trailing"></span>'
+      body += '    </span>'
+      body += `    <input type="text" class="mdc-text-field__input" style="width: 100%" id="${this.cardId}_phone_value" />`
+      body += '  </label>'
+      body += '</div>'
+
+      body += '<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">'
+      body += `  <label class="mdc-text-field mdc-text-field--outlined mdc-text-field--textarea" id="${this.cardId}_message_field" style="width: 100%">`
+      body += '    <span class="mdc-notched-outline">'
+      body += '      <span class="mdc-notched-outline__leading"></span>'
+      body += '      <div class="mdc-notched-outline__notch">'
+      body += `        <label for="${this.cardId}_message_value" class="mdc-floating-label">Message</label>`
       body += '      </div>'
       body += '      <span class="mdc-notched-outline__trailing"></span>'
       body += '    </span>'
       body += '    <span class="mdc-text-field__resizer">'
-      body += '      <textarea class="mdc-text-field__input" rows="4" style="width: 100%" id="' + this.cardId + '_prompt_value"></textarea>'
+      body += `      <textarea class="mdc-text-field__input" rows="4" style="width: 100%" id="${this.cardId}_message_value"></textarea>`
       body += '    </span>'
-      body += '  </label>'
-      body += '</div>'
-      body += '<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">'
-      body += '  <label class="mdc-text-field mdc-text-field--outlined" id="' + this.cardId + '_key_field" style="width: 100%">'
-      body += '    <span class="mdc-notched-outline">'
-      body += '      <span class="mdc-notched-outline__leading"></span>'
-      body += '      <div class="mdc-notched-outline__notch">'
-      body += '        <label for="' + this.cardId + '_message_value" class="mdc-floating-label">Variable Name (Key)</label>'
-      body += '      </div>'
-      body += '      <span class="mdc-notched-outline__trailing"></span>'
-      body += '    </span>'
-      body += '    <input type="text" class="mdc-text-field__input" style="width: 100%" id="' + this.cardId + '_key_value" />'
       body += '  </label>'
       body += '</div>'
 
+      body += '<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">'
+      body += `  <label class="mdc-text-field mdc-text-field--outlined mdc-text-field--textarea" id="${this.cardId}_value_field" style="width: 100%">`
+      body += '    <span class="mdc-notched-outline">'
+      body += '      <span class="mdc-notched-outline__leading"></span>'
+      body += '      <div class="mdc-notched-outline__notch">'
+      body += `        <label for="${this.cardId}_message_value" class="mdc-floating-label">Value</label>`
+      body += '      </div>'
+      body += '      <span class="mdc-notched-outline__trailing"></span>'
+      body += '    </span>'
+      body += '    <span class="mdc-text-field__resizer">'
+      body += `      <textarea class="mdc-text-field__input" rows="4" style="width: 100%" id="${this.cardId}_value_value"></textarea>`
+      body += '    </span>'
+      body += '  </label>'
+      body += '</div>'
+
+      body += '<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">'
+      body += `<div class="mdc-select mdc-select--outlined" id="${this.cardId}_select_image" style="width: 100%">`
+      body += '  <div class="mdc-select__anchor">'
+      body += '    <span class="mdc-notched-outline">'
+      body += '      <span class="mdc-notched-outline__leading"></span>'
+      body += '      <span class="mdc-notched-outline__notch">'
+      body += '        <span id="outlined-select-label" class="mdc-floating-label">Image</span>'
+      body += '      </span>'
+      body += '      <span class="mdc-notched-outline__trailing"></span>'
+      body += '    </span>'
+      body += '    <span class="mdc-select__selected-text-container">'
+      body += '      <span class="mdc-select__selected-text"></span>'
+      body += '    </span>'
+      body += '    <span class="mdc-select__dropdown-icon">'
+      body += '      <svg class="mdc-select__dropdown-icon-graphic" viewBox="7 10 10 5" focusable="false">'
+      body += '        <polygon class="mdc-select__dropdown-icon-inactive" stroke="none" fill-rule="evenodd" points="7 10 12 15 17 10"></polygon>'
+      body += '        <polygon class="mdc-select__dropdown-icon-active" stroke="none" fill-rule="evenodd" points="7 15 12 10 17 15"></polygon>'
+      body += '      </svg>'
+      body += '    </span>'
+      body += '  </div>'
+      body += '  <div class="mdc-select__menu mdc-menu mdc-menu-surface mdc-menu-surface--fullwidth">'
+      body += `    <ul class="mdc-list" role="listbox" aria-label=Selected Element" id="${this.cardId}_image_list">`
+      body += '      <li class="mdc-list-item" aria-selected="false" data-value="operation-add" role="option">';
+      body += '        <span class="mdc-list-item__ripple"></span>';
+      body += '        <span class="mdc-list-item__text">Last Sent&#8230;</span>';
+      body += '      </li>';
+      body += '    </ul>'
+      body += '  </div>'
+      body += '</div>'
+      body += '</div>'
+
+
       body += '<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-7">'
-      body += '  On success:'
+      body += '  Next:'
       body += '</div>'
       body += '<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-5" style="padding-top: 8px; text-align: right;">'
       body += '  <button class="mdc-icon-button" id="' + this.cardId + '_next_edit">'
@@ -73,17 +205,6 @@ define(['material', 'cards/node', 'jquery'], function (mdc, Node) {
       body += '  </button>'
       body += '</div>'
 
-      body += '<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-7">'
-      body += '  On error:'
-      body += '</div>'
-      body += '<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-5" style="padding-top: 8px; text-align: right;">'
-      body += '  <button class="mdc-icon-button" id="' + this.cardId + '_error_edit">'
-      body += '    <i class="material-icons mdc-icon-button__icon" aria-hidden="true">create</i>'
-      body += '  </button>'
-      body += '  <button class="mdc-icon-button" id="' + this.cardId + '_error_goto">'
-      body += '    <i class="material-icons mdc-icon-button__icon" aria-hidden="true">navigate_next</i>'
-      body += '  </button>'
-      body += '</div>'
       body += '<div class="mdc-dialog" role="alertdialog" aria-modal="true" id="' + this.cardId + '-edit-dialog"  aria-labelledby="' + this.cardId + '-dialog-title" aria-describedby="' + this.cardId + '-dialog-content">'
       body += '  <div class="mdc-dialog__container">'
       body += '    <div class="mdc-dialog__surface">'
@@ -102,7 +223,7 @@ define(['material', 'cards/node', 'jquery'], function (mdc, Node) {
     }
 
     viewBody () {
-      return `<div class="mdc-typography--body1" style="margin: 16px;">Sends generative AI text prompt <em>${this.definition.prompt}</em> to <em>${this.definition.model_name}</em> and stores result in <em>${this.definition.key}</em></div>`
+      return `<div class="mdc-typography--body1" style="margin: 16px;">TODO Safety Plan: <em>${this.definition}</em></div>`
     }
 
     initialize () {
@@ -110,40 +231,8 @@ define(['material', 'cards/node', 'jquery'], function (mdc, Node) {
 
       const me = this
 
-      const promptField = mdc.textField.MDCTextField.attachTo(document.getElementById(this.cardId + '_prompt_field'))
-
-      if (this.definition.prompt !== undefined) {
-        promptField.value = this.definition.prompt
-      }
-
-      $('#' + this.cardId + '_prompt_value').on('change keyup paste', function () {
-        const value = $('#' + me.cardId + '_prompt_value').val()
-
-        me.definition.prompt = value
-
-        me.dialog.markChanged(me.id)
-      })
-
-      const keyField = mdc.textField.MDCTextField.attachTo(document.getElementById(this.cardId + '_key_field'))
-
-      if (this.definition.key !== undefined) {
-        keyField.value = this.definition.key
-      }
-
-      $('#' + this.cardId + '_key_value').on('change keyup paste', function () {
-        const value = $('#' + me.cardId + '_key_value').val()
-
-        me.definition.key = value
-
-        me.dialog.markChanged(me.id)
-      })
-
       me.dialog.initializeDestinationMenu(me.cardId, function (selected) {
-        if (me.targetDestination === 'next') {
-          me.definition.next_id = selected
-        } else {
-          me.definition.error_id = selected
-        }
+        me.definition.next_id = selected
 
         me.dialog.markChanged(me.id)
         me.dialog.loadNode(me.definition)
@@ -183,71 +272,130 @@ define(['material', 'cards/node', 'jquery'], function (mdc, Node) {
         }
       })
 
-      $('#' + this.cardId + '_error_edit').on('click', function () {
-        me.targetDestination = 'error'
+  	  const contactNameField = mdc.textField.MDCTextField.attachTo(document.getElementById(`${this.cardId}_contact_name_field`))
+  	  
+  	  if (this.definition.contact_name !== undefined && this.definition.contact_name !== null) {
+	    contactNameField.value = this.definition.contact_name
+	  }
 
-        dialog.open()
-      })
+	  const phoneField = mdc.textField.MDCTextField.attachTo(document.getElementById(`${this.cardId}_phone_field`))
 
-      $('#' + this.cardId + '_error_goto').on('click', function () {
-        const destinationNodes = me.destinationNodes(me.dialog)
+  	  if (this.definition.phone !== undefined && this.definition.phone !== null) {
+	    phoneField.value = this.definition.phone
+	  }
 
-        for (let i = 0; i < destinationNodes.length; i++) {
-          const destinationNode = destinationNodes[i]
+	  const valueField = mdc.textField.MDCTextField.attachTo(document.getElementById(`${this.cardId}_value_field`))
 
-          if (me.definition.error_id === destinationNode.id) {
-            $("[data-node-id='" + destinationNode.id + "']").css('background-color', '#ffffff')
-          } else {
-            $("[data-node-id='" + destinationNode.id + "']").css('background-color', '#e0e0e0')
-          }
-        }
+  	  if (this.definition.value !== undefined && this.definition.value !== null) {
+	    valueField.value = this.definition.value
+	  }
 
-        const sourceNodes = me.sourceNodes(me.dialog)
+	  const messageField = mdc.textField.MDCTextField.attachTo(document.getElementById(`${this.cardId}_message_field`))
 
-        for (let i = 0; i < sourceNodes.length; i++) {
-          const sourceNode = sourceNodes[i]
+  	  if (this.definition.message !== undefined && this.definition.message !== null) {
+	    messageField.value = this.definition.message
+	  }
 
-          if (me.definition.error_id === sourceNode.id) {
-            $("[data-node-id='" + sourceNode.id + "']").css('background-color', '#ffffff')
-          } else {
-            $("[data-node-id='" + sourceNode.id + "']").css('background-color', '#e0e0e0')
-          }
-        }
-      })
+      const imageField = mdc.select.MDCSelect.attachTo(document.getElementById(`${me.cardId}_select_image`))
 
-      $.get('/generative-ai/models.json', function (data) {
-        const { compare } = Intl.Collator('en-US')
+      imageField.listen('MDCSelect:change', () => {
+        const originalImage = me.definition.image
+        me.definition.image = imageField.value
 
-        data.sort(function (one, two) {
-          return compare(one.name, two.name)
-        })
-
-        $.each(data, function (index, value) {
-          let itemHtml = '<li class="mdc-list-item" aria-selected="false" data-value="' + value.id + '" role="option" data-name="' + value.name + '">'
-          itemHtml += '  <span class="mdc-list-item__ripple"></span>'
-          itemHtml += '  <span class="mdc-list-item__text">' + value.name + '</span>'
-          itemHtml += '</li>'
-
-          $('#' + me.cardId + '_model_list').append(itemHtml)
-        })
-
-        const modelField = mdc.select.MDCSelect.attachTo(document.getElementById(me.cardId + '_select_model'))
-
-        modelField.listen('MDCSelect:change', () => {
-          const originalId = me.definition.model_id
-
-          me.definition.model_id = modelField.value
-          me.definition.model_name = modelField.value
-
-          if (originalId !== me.definition.model_id) {
-            me.dialog.markChanged(me.id)
-          }
-        })
-
-        if (me.definition.model_id !== undefined) {
-          modelField.value = '' + me.definition.model_id
+        if (originalImage !== me.definition.image) {
+          me.dialog.markChanged(me.id)
         }
       })
+      
+      const updateFieldVisibility = function() {
+	   	console.log(`updateFieldVisibility`)
+	   	console.log(me.definition)
+    
+      	if (me.definition.field == null || me.definition.operation == null || me.definition.operation == 'operation-reset') {
+	      	$(`#${me.cardId}_contact_name_field`).hide()
+	      	$(`#${me.cardId}_phone_field`).hide()
+	      	$(`#${me.cardId}_value_field`).hide()
+	      	$(`#${me.cardId}_message_field`).hide()
+	      	$(`#${me.cardId}_select_image`).hide()
+      	} else if (me.definition.operation == 'operation-add') {
+      		const peopleFields = [
+      			'people-distraction',
+      			'people-help',
+      			'provider-medical',
+      			'provider-mental-health'
+      		]
+
+      		const textFields = [
+      			'warning-signs',
+      			'coping-skills',
+      			'crisis-helplines',
+      			'environmental-safety'
+      		]
+
+	    	console.log(`Field: ${me.definition.field}`)
+      		
+      		if (peopleFields.includes(me.definition.field)) {
+		    	console.log(`People field: ${me.definition.field}`)
+		      	$(`#${me.cardId}_contact_name_field`).show()
+		      	$(`#${me.cardId}_phone_field`).show()
+		      	
+		      	$(`#${me.cardId}_value_field`).hide()
+		      	$(`#${me.cardId}_message_field`).hide()
+		      	$(`#${me.cardId}_select_image`).hide()
+		    } else if (textFields.includes(me.definition.field)) {
+		    	console.log(`Text field: ${me.definition.field}`)
+
+		      	$(`#${me.cardId}_message_field`).show()
+
+		      	$(`#${me.cardId}_contact_name_field`).hide()
+		      	$(`#${me.cardId}_phone_field`).hide()
+		      	$(`#${me.cardId}_value_field`).hide()
+		      	$(`#${me.cardId}_select_image`).hide()
+		    } else if (me.definition.field == 'reasons-for-living') {
+		      	$(`#${me.cardId}_message_field`).show()
+		      	$(`#${me.cardId}_select_image`).show()
+
+		      	$(`#${me.cardId}_contact_name_field`).hide()
+		      	$(`#${me.cardId}_phone_field`).hide()
+		      	$(`#${me.cardId}_value_field`).hide()
+		    } else {
+		    	console.log(`Unknown field: ${me.definition.field}`)
+		      	$(`#${me.cardId}_contact_name_field`).hide()
+		      	$(`#${me.cardId}_phone_field`).hide()
+	    	  	$(`#${me.cardId}_value_field`).hide()
+	      		$(`#${me.cardId}_message_field`).hide()
+		      	$(`#${me.cardId}_select_image`).hide()
+		    }
+      	}
+      }
+
+      const selectField = mdc.select.MDCSelect.attachTo(document.getElementById(`${me.cardId}_select_element`))
+
+      selectField.listen('MDCSelect:change', () => {
+        const originalField = me.definition.field
+        me.definition.field = selectField.value
+
+        if (originalField !== me.definition.field) {
+          me.dialog.markChanged(me.id)
+        }
+        
+        updateFieldVisibility()
+      })
+
+      const operationField = mdc.select.MDCSelect.attachTo(document.getElementById(`${me.cardId}_select_operation`))
+
+      operationField.listen('MDCSelect:change', () => {
+        const originalOperation = me.definition.operation
+        me.definition.operation = operationField.value
+
+        if (originalOperation !== me.definition.operation) {
+          me.dialog.markChanged(me.id)
+        }
+
+        updateFieldVisibility()
+      })
+      
+      updateFieldVisibility()
     }
 
     destinationNodes (dialog) {
@@ -259,16 +407,6 @@ define(['material', 'cards/node', 'jquery'], function (mdc, Node) {
         const item = this.dialog.definition[i]
 
         if (item.id === id) {
-          nodes.push(Node.createCard(item, dialog))
-        }
-      }
-
-      const errorId = this.definition.error_id
-
-      for (let i = 0; i < this.dialog.definition.length; i++) {
-        const item = this.dialog.definition[i]
-
-        if (item.id === errorId) {
           nodes.push(Node.createCard(item, dialog))
         }
       }
@@ -288,10 +426,6 @@ define(['material', 'cards/node', 'jquery'], function (mdc, Node) {
       if (this.definition.next_id === oldId) {
         this.definition.next_id = newId
       }
-
-      if (this.definition.error_id === oldId) {
-        this.definition.error_id = newId
-      }
     }
 
     cardType () {
@@ -304,6 +438,8 @@ define(['material', 'cards/node', 'jquery'], function (mdc, Node) {
 
     issues () {
       const issues = super.issues()
+      
+      /*
 
       if (this.definition.next_id === undefined) {
         issues.push([this.definition.id, 'Next node does not point to another node.', this.definition.name])
@@ -324,6 +460,7 @@ define(['material', 'cards/node', 'jquery'], function (mdc, Node) {
       if (this.definition.key === undefined || this.definition.key === undefined) {
         issues.push([this.definition.id, 'Variable key not defined.', this.definition.name])
       }
+      */
 
       return issues
     }

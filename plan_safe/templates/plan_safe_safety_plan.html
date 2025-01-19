@@ -1,0 +1,441 @@
+{% load static %}
+{% load plan_safe %}
+<!doctype html>
+<html lang="en">
+    <head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <link rel="icon" type="image/x-icon" href="{% static 'dashboard/favicon/favicon.ico' %}">
+		<link href="{% static 'dashboard/css/vendor/bootstrap.min.css' %}" rel="stylesheet">
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+        <title>Your Safety Plan | {{ project_name }}</title>
+
+        <style>
+        </style>
+    </head>
+	{% with user.fetch_safety_plan as safety_plan %}
+		<body class="bg-light">
+			<div class="container card mt-3">
+				<div class="card-body">
+					<div class="row">
+						<div class="col-md-12">
+							<h3>{{ user }}'s Safety Plan</h3>
+						</div>
+						<div class="col-md-4 pt-4">
+							{% with safety_plan.fetch_warning_signs as warning_signs %}
+								<ul class="list-group mb-4" id="list_warning_sign">
+									<li class="list-group-item text-bg-light">
+										<strong>Warning Signs</strong>
+									</li>
+									<li class="list-group-item">
+										<small>
+											Warning signs are clues that someone might soon experience suicidal thoughts and can include behaviors such as yelling, feelings such as restlessness, and thoughts such as those that focus on death.
+											Noticing these clues is the first step towards knowing when a safety plan might be helpful.
+										</small>
+									</li>
+									{% if warning_signs %}
+										{% for warning_sign in warning_signs %}
+											<li class="list-group-item">
+												{{ warning_sign }}
+												<a href="#" class="action-delete" data-type="warning_sign" data-value="{{ warning_sign }}"><i class="bi bi-trash float-end"></i></a>
+											</li>
+										{% endfor %}
+									{% else %}
+										<li class="list-group-item empty-list">
+											<em>Please enter a warning sign below&#8230;</em>
+										</li>
+									{% endif %}
+									<li class="list-group-item p-3">
+										<div class="input-group">
+											<input type="text" class="form-control" placeholder="Add warning sign&#8230;" aria-label="Add warning sign&#8230;" aria-describedby="button-warning">
+											<button class="btn btn-secondary action-add" type="button" id="button-warning" data-type="warning_sign">
+												<i class="bi bi-plus"></i>
+											</button>
+										  </div>
+									</li>
+								</ul>
+							{% endwith %}
+						</div>
+
+						<div class="col-md-4 pt-4">
+							{% with safety_plan.fetch_coping_skills as coping_skills %}
+								<ul class="list-group mb-4">
+									<li class="list-group-item text-bg-light">
+										<strong>Coping Skills</strong>
+									</li>
+									<li class="list-group-item">
+										<small>
+											Coping skills are strategies and tools that can be used by someone with suicidal thoughts to reduce the intensity of those thoughts.
+											Coping skills that are engaging can be especially helpful, such as physical activity or watching a movie.
+										</small>
+									</li>
+									{% if coping_skills %}
+										{% for coping_skill in coping_skills %}
+											<li class="list-group-item">
+												{{ coping_skill }}
+												<a href="#" class="action-delete" data-type="coping_skill" data-value="{{ coping_skill }}"><i class="bi bi-trash float-end"></i></a>
+											</li>
+										{% endfor %}
+									{% else %}
+										<li class="list-group-item empty-list">
+											<em>Please enter a coping skill below&#8230;</em>
+										</li>
+									{% endif %}
+									<li class="list-group-item p-3">
+										<div class="input-group">
+											<input type="text" class="form-control" placeholder="Add coping skill&#8230;" aria-label="Add coping skill&#8230;" aria-describedby="button-coping">
+											<button class="btn btn-secondary action-add" type="button" id="button-coping" data-type="coping_skill">
+												<i class="bi bi-plus"></i>
+											</button>
+										</div>
+									</li>
+								</ul>
+							{% endwith %}
+						</div>
+
+						<div class="col-md-4 pt-4">
+							{% with safety_plan.fetch_people_distraction as people %}
+								<ul class="list-group mb-4">
+									<li class="list-group-item text-bg-light">
+										<strong>People for Distractions</strong>
+										<i class="bi bi-chat-left-fill float-end message-tooltop" data-bs-toggle="tooltip" data-bs-title="TODO"></i>
+									</li>
+									<li class="list-group-item">
+										<small>
+											Other people, such as family, friends, or acquaintances, can help distract from suicidal thoughts.
+											Reaching out to a trusted other and starting a conversation or asking for a distraction can be useful.
+										</small>
+									</li>
+									{% if people %}
+										{% for person in people %}
+											<li class="list-group-item">
+												{% if person.message %}<i class="bi bi-chat-left-text-fill message-tooltop" data-bs-toggle="tooltip" data-bs-title="{{ person.message }}" data-type="person_distraction" data-value="{{ person.name }}"></i>{% else %}<i class="bi bi-chat-left message-tooltop" data-bs-toggle="tooltip" data-bs-title="(No message available.)" data-type="person_distraction" data-value="{{ person.name }}"></i>{% endif %}
+												{{ person.name }}
+												<a href="#" class="action-delete" data-type="person_distraction" data-value="{{ person.name }}"><i class="bi bi-trash float-end"></i></a>
+											</li>
+										{% endfor %}
+									{% else %}
+										<li class="list-group-item empty-list">
+											<em>Please enter a person for distraction below&#8230;</em>
+										</li>
+									{% endif %}
+									<li class="list-group-item p-3">
+										<div class="input-group">
+											<input type="text" class="form-control" placeholder="Add a person for distraction&#8230;" aria-label="Add a person for distraction&#8230;" aria-describedby="button-distraction">
+											<button class="btn btn-secondary action-add" type="button" id="button-distraction" data-type="person_distraction">
+												<i class="bi bi-plus"></i>
+											</button>
+										</div>
+									</li>
+								</ul>
+							{% endwith %}
+						</div>
+
+						<div class="col-md-4 pt-4">
+							{% with safety_plan.fetch_people_help as people %}
+								<ul class="list-group mb-4">
+									<li class="list-group-item text-bg-light">
+										<strong>People for Help</strong>
+										<i class="bi bi-chat-left-fill float-end message-tooltop" data-bs-toggle="tooltip" data-bs-title="TODO"></i>
+									</li>
+									<li class="list-group-item">
+										<small>
+											Reaching out to someone you trust like a friend, family member, or acquaintance can be useful when you need help staying safe.
+										</small>
+									</li>
+									{% if people %}
+										{% for person in people %}
+											<li class="list-group-item">
+												{% if person.message %}<i class="bi bi-chat-left-text-fill message-tooltop" data-bs-toggle="tooltip" data-bs-title="{{ person.message }}" data-type="person_help" data-value="{{ person.name }}"></i>{% else %}<i class="bi bi-chat-left message-tooltop" data-bs-toggle="tooltip" data-bs-title="(No message available.)" data-type="person_help" data-value="{{ person.name }}"></i>{% endif %}
+												{{ person.name }}
+												<a href="#" class="action-delete" data-type="person_help" data-value="{{ person.name }}"><i class="bi bi-trash float-end"></i></a>
+											</li>
+										{% endfor %}
+									{% else %}
+										<li class="list-group-item empty-list">
+											<em>Please enter a person for help below&#8230;</em>
+										</li>
+									{% endif %}
+									<li class="list-group-item p-3">
+										<div class="input-group mb-2">
+											<input type="text" class="form-control" placeholder="Add a person for help&#8230;" aria-label="Add a person for help&#8230;" aria-describedby="button-help">
+											<button class="btn btn-secondary action-add" type="button" id="button-help" data-type="person_help">
+												<i class="bi bi-plus"></i>
+											</button>
+										</div>
+									</li>
+								</ul>
+							{% endwith %}
+						</div>
+
+						<div class="col-md-8 pt-4">
+							<ul class="list-group mb-4">
+								<li class="list-group-item text-bg-light">
+									<strong>Crisis Help Lines</strong>
+								</li>
+								<li class="list-group-item">
+									<small>
+										Crisis helplines are free resources that are available to listen and provide support for people experiencing suicidal crises.
+										They are typically staffed by trained professionals or volunteers who can provide support or guidance and are available 24/7.
+									</small>
+								</li>
+
+								{% for crisis_help_line in crisis_help_lines %}
+									<li class="list-group-item">
+										<input class="form-check-input me-1 crisis_line_check" type="checkbox" value="" id="crisis_help_line_{{ crisis_help_line.pk }}" data-id="{{ crisis_help_line.pk }}" {% if crisis_help_line.pk in selected_help_lines %}checked{% endif %}>
+										<label class="form-check-label" for="crisis_help_line_{{ crisis_help_line.pk }}">
+											{% if crisis_help_line.website %}
+												<a href="{{ crisis_help_line.website }}" class="text-decoration-none" target="_blank">{{ crisis_help_line.name }}</a>
+											{% else %}
+												{{ crisis_help_line.name }}
+											{% endif %}
+										</label>
+										{% if crisis_help_line.voice_url %}
+											<a class="badge text-bg-primary float-end ms-2 text-decoration-none" href="{{ crisis_help_line.voice_url }}">
+												<i class="bi bi-telephone-fill"></i> {{ crisis_help_line.voice_label }}
+											</a>
+										{% endif %}
+										{% if crisis_help_line.messaging_url %}
+											<a class="badge text-bg-primary float-end ms-2 text-decoration-none" href="{{ crisis_help_line.messaging_url }}">
+												<i class="bi bi-chat-left-fill"></i> {{ crisis_help_line.messaging_label }}
+											</a>
+										{% endif %}
+									</li>
+								{% endfor %}
+								<li class="list-group-item">
+									<small>Please select the crisis help lines to be a part of your safety plan above.</small>
+								</li>
+							</ul>
+						</div>
+
+						<div class="col-md-4 pt-4">
+							{% with safety_plan.fetch_people_medical_provider as people %}
+								<ul class="list-group mb-4">
+									<li class="list-group-item text-bg-light">
+										<strong>Medical Providers</strong>
+										<i class="bi bi-chat-left-fill float-end message-tooltop" data-bs-toggle="tooltip" data-bs-title="TODO"></i>
+									</li>
+									<li class="list-group-item">
+										<small>
+											Medical providers can include providers like a primary care doctor or family practitioner.
+										</small>
+									</li>
+									{% if people %}
+										{% for person in people %}
+											<li class="list-group-item">
+												{% if person.message %}<i class="bi bi-chat-left-text-fill message-tooltop" data-bs-toggle="tooltip" data-bs-title="{{ person.message }}" data-type="person_medical" data-value="{{ person.name }}"></i>{% else %}<i class="bi bi-chat-left message-tooltop" data-bs-toggle="tooltip" data-bs-title="(No message available.)" data-type="person_medical" data-value="{{ person.name }}"></i>{% endif %}
+												{{ person.name }}
+												<a href="#" class="action-delete" data-type="person_medical" data-value="{{ person.name }}"><i class="bi bi-trash float-end"></i></a>
+											</li>
+										{% endfor %}
+									{% else %}
+										<li class="list-group-item empty-list">
+											<em>Please enter a medical provider below&#8230;</em>
+										</li>
+									{% endif %}
+									<li class="list-group-item p-3">
+										<div class="input-group">
+											<input type="text" class="form-control" placeholder="Add a medical provider&#8230;" aria-label="Add a medical provider&#8230;" aria-describedby="button-medical">
+											<button class="btn btn-secondary action-add" type="button" id="button-medical" data-type="person_medical">
+												<i class="bi bi-plus"></i>
+											</button>
+										</div>
+									</li>
+								</ul>
+							{% endwith %}
+						</div>
+
+						<div class="col-md-4 pt-4">
+							{% with safety_plan.fetch_people_mental_health_provider as people %}
+								<ul class="list-group mb-4">
+									<li class="list-group-item text-bg-light">
+										<strong>Mental Health Providers</strong>
+										<i class="bi bi-chat-left-fill float-end message-tooltop" data-bs-toggle="tooltip" data-bs-title="TODO"></i>
+									</li>
+									<li class="list-group-item">
+										<small>
+											Mental health providers can include counselors, therapists or other mental health professionals.
+										</small>
+									</li>
+									{% if people %}
+										{% for person in people %}
+											<li class="list-group-item">
+												{% if person.message %}<i class="bi bi-chat-left-text-fill message-tooltop" data-bs-toggle="tooltip" data-bs-title="{{ person.message }}" data-type="person_mental" data-value="{{ person.name }}"></i>{% else %}<i class="bi bi-chat-left message-tooltop" data-bs-toggle="tooltip" data-bs-title="(No message available.)" data-type="person_mental" data-value="{{ person.name }}"></i>{% endif %}
+												{{ person.name }}
+												<a href="#" class="action-delete" data-type="person_mental" data-value="{{ person.name }}"><i class="bi bi-trash float-end"></i></a>
+											</li>
+										{% endfor %}
+									{% else %}
+										<li class="list-group-item empty-list">
+											<em>Please enter a mental health provider below&#8230;</em>
+										</li>
+									{% endif %}
+									<li class="list-group-item p-3">
+										<div class="input-group">
+											<input type="text" class="form-control" placeholder="Add a mental health provider&#8230;" aria-label="Add a mental health provider&#8230;" aria-describedby="button-mental-health">
+											<button class="btn btn-secondary action-add" type="button" id="button-mental-health" data-type="person_mental">
+												<i class="bi bi-plus"></i>
+											</button>
+										</div>
+									</li>
+								</ul>
+							{% endwith %}
+						</div>
+
+						<div class="col-md-4 pt-4">
+							{% with safety_plan.fetch_environmental_safety as safeties %}
+								<ul class="list-group mb-4">
+									<li class="list-group-item text-bg-light">
+										<strong>Environmental Safety</strong>
+									</li>
+									<li class="list-group-item">
+										<small>
+											Because suicidal thoughts can become intense quickly, it is useful to consider ways of making the spaces around you safer during a crisis.
+											Limiting access to lethal items is one effective strategy for increasing environmental safety.
+										</small>
+									</li>
+									{% if safeties %}
+										{% for safety in safeties %}
+											<li class="list-group-item">
+												{{ safety }}
+												<a href="#" class="action-delete" data-type="environmental_safety" data-value="{{ safety }}"><i class="bi bi-trash float-end"></i></a>
+											</li>
+										{% endfor %}
+									{% else %}
+										<li class="list-group-item empty-list">
+											<em>Please enter an environmental safety below&#8230;</em>
+										</li>
+									{% endif %}
+									<li class="list-group-item p-3">
+										<div class="input-group">
+											<input type="text" class="form-control" placeholder="Add an environmental safety&#8230;" aria-label="Add an environmental safety&#8230;" aria-describedby="button-environment">
+											<button class="btn btn-secondary action-add" type="button" id="button-environment" data-type="environmental_safety">
+												<i class="bi bi-plus"></i>
+											</button>
+										</div>
+									</li>
+								</ul>
+							{% endwith %}
+						</div>
+
+						<div class="col-md-4 pt-4">
+							{% with safety_plan.fetch_reason_for_living as reasons %}
+								<ul class="list-group mb-4">
+									<li class="list-group-item text-bg-light">
+										<strong>Reasons for Living</strong>
+									</li>
+									<li class="list-group-item">
+										<small>
+											Reasons for living are the deeply personal motivations, relationships, values, and goals that give people a sense of purpose in life.
+										</small>
+									</li>
+									{% if reasons %}
+										{% for reason in reasons %}
+											<li class="list-group-item">
+												{% if reason.image %}
+													<a href="#" class="bi bi-image reason-preview-image" data-image="{{ reason.image.url }}"></a>
+												{% endif %}
+												{{ reason }}
+												<a href="#" class="action-delete-reason float-end" data-type="reason_living" data-id="{{ reason.pk }}" data-value="{{ reason }}"><i class="bi bi-trash float-end"></i></a>
+											</li>
+										{% endfor %}
+									{% else %}
+										<li class="list-group-item empty-list">
+											<em>Please enter a reason for living below&#8230;</em>
+										</li>
+									{% endif %}
+									<li class="list-group-item p-3">
+										<div class="input-group">
+											<button class="btn btn-secondary" type="button" id="button-reason-image">
+												<i class="bi bi-image"></i>
+											</button>
+											<input type="text" class="form-control" placeholder="Add a reason for living&#8230;" aria-label="Add an environmental safety&#8230;" aria-describedby="button-reason">
+											<button class="btn btn-secondary" type="button" id="button-reason">
+												<i class="bi bi-plus"></i>
+											</button>
+										</div>
+										<input type="file" id="reason_file" class="d-none" accept=".png,.gif,.jpg,.jpeg"/>
+									</li>
+								</ul>
+							{% endwith %}
+						</div>
+
+						<div class="col-md-4 pt-4">
+							{% with safety_plan.fetch_reason_for_living as reasons %}
+								<ul class="list-group mb-4">
+									<li class="list-group-item text-bg-light">
+										<strong>Plan Details</strong>
+									</li>
+									<li class="list-group-item">
+										{{ user.fetch_phone_number }}<br />
+										<small>Phone Number</small>
+									</li>
+									<li class="list-group-item">
+										{{ user.created }}<br />
+										<small>Created</small>
+									</li>
+									<li class="list-group-item">
+										{{ user.updated }}<br />
+										<small>Last Updated</small>
+									</li>
+								</ul>
+							{% endwith %}
+						</div>
+					</div>
+				</div>
+			</div>
+		</body>
+	{% endwith %}
+	<div class="modal" tabindex="-1" role="dialog" id="confirmation_dialog">
+		<div class="modal-dialog">
+		  <div class="modal-content">
+			<div class="modal-header">
+			  <h5 class="modal-title">Modal title</h5>
+			  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+			  <p>Modal body text goes here.</p>
+			</div>
+			<div class="modal-footer">
+			  <button type="button" class="btn btn-primary">Save changes</button>
+			  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+			</div>
+		  </div>
+		</div>
+	</div>
+	<div class="modal" tabindex="-1" role="dialog" id="message_dialog">
+		<div class="modal-dialog">
+		  <div class="modal-content">
+			<div class="modal-header">
+			  <h5 class="modal-title">Update message</h5>
+			  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<div class="mb-3">
+					<textarea class="form-control" id="helper_message" rows="3" placeholder="Enter message here&#8230;"></textarea>
+				</div>
+			</div>
+			<div class="modal-footer">
+			  <button type="button" class="btn btn-primary">Save</button>
+			  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+			</div>
+		  </div>
+		</div>
+	</div>
+	<div class="modal" tabindex="-1" role="dialog" id="preview_dialog">
+		<div class="modal-dialog">
+		  <div class="modal-content">
+			<div class="modal-header">
+			  <h5 class="modal-title">Reason for living</h5>
+			  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body p-0">
+				<img id="preview_image" class="rounded-bottom" style="width: 100%;">
+			</div>
+		  </div>
+		</div>
+	</div>
+
+	<script data-main="{% static 'plan_safe/js/app/plan_safe_safety_plan.js' %}" src="{% static 'dashboard/js/vendor/require.js' %}"></script>
+</html>

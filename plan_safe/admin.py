@@ -1,3 +1,5 @@
+# pylint: disable=line-too-long
+
 from prettyjson import PrettyJSONWidget
 
 from django.contrib import admin
@@ -7,11 +9,11 @@ try:
 except ImportError:
     from django.contrib.postgres.fields import JSONField
 
-from .models import Participant, TimeZone, StudyArm, SafetyPlan, ReasonForLiving
+from .models import Participant, TimeZone, StudyArm, SafetyPlan, ReasonForLiving, CrisisHelpLine
 
 @admin.register(Participant)
 class ParticipantAdmin(admin.ModelAdmin):
-    list_display = ('identifier', 'fetch_phone_number', 'personalized_name', 'time_zone', 'created', 'updated',)
+    list_display = ('identifier', 'fetch_phone_number', 'login_token', 'personalized_name', 'time_zone', 'created', 'updated',)
     list_filter = ('time_zone', 'created', 'updated',)
 
     formfield_overrides = {
@@ -34,3 +36,8 @@ class SafetyPlanAdmin(admin.ModelAdmin):
 @admin.register(ReasonForLiving)
 class ReasonForLivingAdmin(admin.ModelAdmin):
     list_display = ('safety_plan', 'created', 'caption')
+
+@admin.register(CrisisHelpLine)
+class CrisisHelpLineAdmin(admin.ModelAdmin):
+    list_display = ('name', 'voice_url', 'messaging_url', 'website',)
+    search_fields = ('name', 'voice_url', 'messaging_url', 'voice_label', 'messaging_label', 'website',)

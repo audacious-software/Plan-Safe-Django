@@ -1,15 +1,9 @@
 # pylint: disable=no-member, line-too-long, fixme
 
-import importlib
 import json
-import logging
 import traceback
 
-from django.conf import settings
-
-from django_dialog_engine.dialog import BaseNode, DialogTransition, fetch_default_logger
-
-from .models import GenerativeAIModel, GenerativeAIException
+from django_dialog_engine.dialog import BaseNode, DialogTransition
 
 class UpdateSafetyPlanNode(BaseNode):
     @staticmethod
@@ -29,8 +23,15 @@ class UpdateSafetyPlanNode(BaseNode):
 
         self.next_node_id = next_node_id
         self.field = field
-        self.value = value
         self.operation = operation
+
+        value = value.replace('&', '\n')
+        value = value.replace('\r', '\n')
+
+        while '\n\n' in value:
+            value = value.replace('\n\n', '\n')
+
+        self.value = value.splitlines()
 
     def node_type(self):
         return 'plan-safe-update-safety-plan'
@@ -47,7 +48,71 @@ class UpdateSafetyPlanNode(BaseNode):
         return json.dumps(definition, indent=2)
 
     def evaluate(self, dialog, response=None, last_transition=None, extras=None, logger=None): # pylint: disable=too-many-arguments, too-many-locals, too-many-branches, too-many-statements, unused-argument
-        # Update safety plan
+        safety_plan = extras.get('safety_plan', None)
+
+        if self.field == 'coping-skills':
+            if self.operation == 'operation-add':
+                safety_plan.add_coping_skills(self.value)
+            elif self.operation == 'operation-remove':
+                safety_plan.remove_coping_skills(self.value)
+            elif self.operation == 'operation-reset':
+                safety_plan.reset_coping_skills()
+        elif self.field == 'warning-signs':
+            if self.operation == 'operation-add':
+                safety_plan.add_warning_signs(self.value)
+            elif self.operation == 'operation-remove':
+                safety_plan.remove_warning_signs(self.value)
+            elif self.operation == 'operation-reset':
+                safety_plan.reset_warning_signs()
+        elif self.field == 'environmental-safety':
+            if self.operation == 'operation-add':
+                safety_plan.add_environmental_safeties(self.value)
+            elif self.operation == 'operation-remove':
+                safety_plan.remove_environmental_safeties(self.value)
+            elif self.operation == 'operation-reset':
+                safety_plan.reset_environmental_safety()
+        elif self.field == 'people-distraction':
+            if self.operation == 'operation-add':
+                safety_plan.add_people_distractions(self.value)
+            elif self.operation == 'operation-remove':
+                safety_plan.remove_people_distractions(self.value)
+            elif self.operation == 'operation-reset':
+                safety_plan.reset_people_distraction()
+        elif self.field == 'people-help':
+            if self.operation == 'operation-add':
+                safety_plan.add_people_helps(self.value)
+            elif self.operation == 'operation-remove':
+                safety_plan.remove_people_helps(self.value)
+            elif self.operation == 'operation-reset':
+                safety_plan.reset_people_help()
+        elif self.field == 'provider-medical':
+            if self.operation == 'operation-add':
+                safety_plan.add_people_medical_providers(self.value)
+            elif self.operation == 'operation-remove':
+                safety_plan.remove_people_medical_providers(self.value)
+            elif self.operation == 'operation-reset':
+                safety_plan.reset_people_medical_provider()
+        elif self.field == 'provider-mental-health':
+            if self.operation == 'operation-add':
+                safety_plan.add_people_mental_health_providers(self.value)
+            elif self.operation == 'operation-remove':
+                safety_plan.remove_people_mental_health_providers(self.value)
+            elif self.operation == 'operation-reset':
+                safety_plan.reset_people_mental_health_provider()
+        elif self.field == 'reasons-for-living':
+            if self.operation == 'operation-add':
+                safety_plan.add_reasons_for_living(self.value)
+            elif self.operation == 'operation-remove':
+                safety_plan.remove_reasons_for_living(self.value)
+            elif self.operation == 'operation-reset':
+                safety_plan.reset_reason_for_living()
+        elif self.field == 'crisis-helplines':
+            if self.operation == 'operation-add':
+                safety_plan.add_crisis_help_lines(self.value)
+            elif self.operation == 'operation-remove':
+                safety_plan.remove_crisis_help_lines(self.value)
+            elif self.operation == 'operation-reset':
+                safety_plan.reset_crisis_help_line()
 
         transition = DialogTransition(new_state_id=self.next_node_id)
 
@@ -73,7 +138,7 @@ def dialog_builder_cards():
     ]
 
 
-def identify_script_issues(script): # pylint: disable=too-many-locals, too-many-branches
+def identify_script_issues(script): # pylint: disable=unused-argument
     issues = []
 
     # TBD

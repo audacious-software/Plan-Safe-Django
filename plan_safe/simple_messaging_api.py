@@ -1,3 +1,5 @@
+# pylint: disable=no-member
+
 from .models import Participant
 
 def fetch_phone_number(identifier):
