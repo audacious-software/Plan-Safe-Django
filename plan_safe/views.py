@@ -20,7 +20,7 @@ def plan_safe_safety_plan(request, token): # pylint: disable=unused-argument, to
         'token': token,
     }
 
-    token_user = Participant.objects.exclude(login_token=None).exclude(login_token='').filter(login_token=token).first()
+    token_user = Participant.objects.exclude(login_token=None).exclude(login_token='').filter(login_token=token).first() # nosec
 
     if token_user is None:
         raise Http404
