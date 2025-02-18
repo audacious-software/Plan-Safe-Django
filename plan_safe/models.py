@@ -118,8 +118,8 @@ class Participant(models.Model):
         return self.safety_plans.order_by('-created').first()
 
     def get_absolute_url(self):
-        if self.login_token is None or self.login_token == '':
-            self.login_token = get_random_string(length=32) # nosec
+        if self.login_token is None or self.login_token == '':  # nosec
+            self.login_token = get_random_string(length=32)
             self.save()
 
         return '%s%s' % (settings.SITE_URL, reverse('plan_safe_safety_plan', args=[self.login_token]))
