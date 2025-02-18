@@ -297,14 +297,13 @@ def plan_safe_safety_plan(request, token): # pylint: disable=unused-argument, to
             return HttpResponse(json.dumps(response_json, indent=2), content_type='application/json', status=500)
 
     context['user'] = token_user
-    context['crisis_help_lines'] = CrisisHelpLine.objects.all()
+    context['crisis_help_lines'] = CrisisHelpLine.objects.all().order_by('order_label')
 
     selected_lines = []
 
-
     if safety_plan is not None:
         for line in safety_plan.crisis_help_lines.all():
-            selected_lines.append(line.pk)
+            selected_lines.append(line.order_label)
 
     context['selected_help_lines'] = selected_lines
 

@@ -1,12 +1,24 @@
 # pylint: disable=no-member, line-too-long
 
+from urllib.parse import urlparse
+
+try:
+    from collections import UserDict
+except ImportError:
+    from UserDict import UserDict
+
 import phonenumbers
 import pytz
+import requests
 
+from django.conf import settings
+from django.core.files.base import ContentFile
 from django.db import models
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
+from django.urls import reverse
 from django.utils import timezone
+from django.utils.crypto import get_random_string
 
 from simple_messaging.models import encrypt_value, decrypt_value
 
@@ -41,6 +53,8 @@ class CrisisHelpLine(models.Model):
     messaging_url = models.CharField(max_length=1024, null=True, blank=True)
     messaging_label = models.CharField(max_length=1024, null=True, blank=True)
     website = models.URLField(max_length=2048, null=True, blank=True)
+
+    order_label = models.IntegerField(default=0)
 
     def __str__(self):
         return str(self.name)
@@ -103,6 +117,12 @@ class Participant(models.Model):
     def fetch_safety_plan(self):
         return self.safety_plans.order_by('-created').first()
 
+    def get_absolute_url(self):
+        if self.login_token is None or self.login_token == '':
+            self.login_token = get_random_string(length=32)
+            self.save()
+
+        return '%s%s' % (settings.SITE_URL, reverse('plan_safe_safety_plan', args=[self.login_token]))
 
 class SafetyPlan(models.Model): # pylint: disable=too-many-public-methods
     participant = models.ForeignKey(Participant, null=True, blank=True, related_name='safety_plans', on_delete=models.SET_NULL)
@@ -579,8 +599,30 @@ class SafetyPlan(models.Model): # pylint: disable=too-many-public-methods
 
     def add_reasons_for_living(self, reasons_for_living):
         for reason in reasons_for_living:
-            if self.reason_for_living.filter(caption__iequals=reason.strip().lower()).count() == 0:
-                ReasonForLiving.objects.create(safety_plan=self, created=timezone.now(), caption=reason.strip())
+            reason_text = str(reason).strip()
+
+            if reason_text == '' or self.reason_for_living.filter(caption__iexact=reason_text.lower()).count() == 0:
+                reason_obj = ReasonForLiving.objects.create(safety_plan=self, created=timezone.now(), caption=reason_text.strip())
+
+                if isinstance(reason, UserDict):
+                    for media_item in reason.get('media', []):
+                        media_type = media_item.get('type', '')
+
+                        if media_type.startswith('image/'):
+                            image_url = media_item.get('url', None)
+
+                            if image_url is not None:
+                                image_response = requests.get(image_url)
+
+                                parsed = urlparse(image_url)
+
+                                filename = parsed.path.split('/')[-1]
+
+                                reason_obj.image.save(filename, ContentFile(image_response.content))
+
+                                reason_obj.save()
+
+                                break
 
     def remove_reasons_for_living(self, reasons_for_living):
         for reason in reasons_for_living:
@@ -588,7 +630,6 @@ class SafetyPlan(models.Model): # pylint: disable=too-many-public-methods
 
     def reset_reason_for_living(self):
         self.reason_for_living.all().delete()
-
 
     def fetch_crisis_help_lines(self):
         help_lines = []
@@ -599,19 +640,46 @@ class SafetyPlan(models.Model): # pylint: disable=too-many-public-methods
         return help_lines
 
     def add_crisis_help_lines(self, crisis_help_lines):
-        for help_line in crisis_help_lines:
-            if self.crisis_help_lines.filter(name__iequals=help_line.strip().lower()).count() == 0:
-                existing_line = CrisisHelpLine.objects.filter(name__iequals=help_line).first()
+        line_labels = []
 
-                if existing_line is not None:
-                    self.crisis_help_lines.add(existing_line)
+        for help_line in crisis_help_lines:
+            tokens = str(help_line).split()
+
+            for token in tokens:
+                if (token in line_labels) is False:
+                    line_labels.append(token)
+
+            for line_label in line_labels:
+                try:
+                    existing_line = CrisisHelpLine.objects.filter(order_label=int(line_label)).first()
+
+                    if existing_line is not None:
+                        self.crisis_help_lines.add(existing_line)
+                except ValueError:
+                    pass # Not found
+
+        self.save()
 
     def remove_crisis_help_lines(self, crisis_help_lines):
-        for help_line in crisis_help_lines:
-            existing_line = self.crisis_help_lines.filter(name__iequals=help_line.strip().lower()).first()
+        line_labels = []
 
-            if existing_line is not None:
-                self.crisis_help_lines.remove(existing_line)
+        for help_line in crisis_help_lines:
+            tokens = help_line.split()
+
+            for token in tokens:
+                if (token in line_labels) is False:
+                    line_labels.append(token)
+
+            for line_label in line_labels:
+                try:
+                    existing_line = CrisisHelpLine.objects.filter(order_label=int(line_label)).first()
+
+                    if existing_line is not None:
+                        self.crisis_help_lines.remove(existing_line)
+                except ValueError:
+                    pass # Not found
+
+        self.save()
 
     def reset_crisis_help_line(self):
         self.crisis_help_lines.clear()

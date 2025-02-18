@@ -183,8 +183,8 @@
 
 								{% for crisis_help_line in crisis_help_lines %}
 									<li class="list-group-item">
-										<input class="form-check-input me-1 crisis_line_check" type="checkbox" value="" id="crisis_help_line_{{ crisis_help_line.pk }}" data-id="{{ crisis_help_line.pk }}" {% if crisis_help_line.pk in selected_help_lines %}checked{% endif %}>
-										<label class="form-check-label" for="crisis_help_line_{{ crisis_help_line.pk }}">
+										<input class="form-check-input me-1 crisis_line_check" type="checkbox" value="" id="crisis_help_line_{{ crisis_help_line.order_label }}" data-id="{{ crisis_help_line.order_label }}" {% if crisis_help_line.order_label in selected_help_lines %}checked{% endif %}>
+										<label class="form-check-label" for="crisis_help_line_{{ crisis_help_line.order_label }}">
 											{% if crisis_help_line.website %}
 												<a href="{{ crisis_help_line.website }}" class="text-decoration-none" target="_blank">{{ crisis_help_line.name }}</a>
 											{% else %}

@@ -39,5 +39,5 @@ class ReasonForLivingAdmin(admin.ModelAdmin):
 
 @admin.register(CrisisHelpLine)
 class CrisisHelpLineAdmin(admin.ModelAdmin):
-    list_display = ('name', 'voice_url', 'messaging_url', 'website',)
+    list_display = ('name', 'order_label', 'voice_url', 'messaging_url', 'website',)
     search_fields = ('name', 'voice_url', 'messaging_url', 'voice_label', 'messaging_label', 'website',)

@@ -90,11 +90,11 @@ define(['material', 'cards/node', 'jquery'], function (mdc, Node) {
       body += `    <ul class="mdc-list" role="listbox" aria-label=Selected Element" id="${this.cardId}_operation_list">`
       body += '      <li class="mdc-list-item" aria-selected="false" data-value="operation-add" role="option">';
       body += '        <span class="mdc-list-item__ripple"></span>';
-      body += '        <span class="mdc-list-item__text">Add To&#8230;</span>';
+      body += '        <span class="mdc-list-item__text">Append&#8230;</span>';
       body += '      </li>';
       body += '      <li class="mdc-list-item" aria-selected="false" data-value="operation-remove" role="option">';
       body += '        <span class="mdc-list-item__ripple"></span>';
-      body += '        <span class="mdc-list-item__text">Remove From&#8230;</span>';
+      body += '        <span class="mdc-list-item__text">Remove&#8230;</span>';
       body += '      </li>';
       body += '      <li class="mdc-list-item" aria-selected="false" data-value="operation-reset" role="option">';
       body += '        <span class="mdc-list-item__ripple"></span>';
@@ -106,52 +106,11 @@ define(['material', 'cards/node', 'jquery'], function (mdc, Node) {
       body += '</div>'
 
       body += '<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">'
-      body += `  <label class="mdc-text-field mdc-text-field--outlined mdc-text-field--textarea" id="${this.cardId}_contact_name_field" style="width: 100%">`
-      body += '    <span class="mdc-notched-outline">'
-      body += '      <span class="mdc-notched-outline__leading"></span>'
-      body += '      <div class="mdc-notched-outline__notch">'
-      body += `        <label for="${this.cardId}_message_value" class="mdc-floating-label">Contact Name</label>`
-      body += '      </div>'
-      body += '      <span class="mdc-notched-outline__trailing"></span>'
-      body += '    </span>'
-      body += `    <input type="text" class="mdc-text-field__input" style="width: 100%" id="${this.cardId}_contact_name_value" />`
-      body += '  </label>'
-      body += '</div>'
-
-      body += '<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">'
-      body += `  <label class="mdc-text-field mdc-text-field--outlined mdc-text-field--textarea" id="${this.cardId}_phone_field" style="width: 100%">`
-      body += '    <span class="mdc-notched-outline">'
-      body += '      <span class="mdc-notched-outline__leading"></span>'
-      body += '      <div class="mdc-notched-outline__notch">'
-      body += `        <label for="${this.cardId}_message_value" class="mdc-floating-label">Phone Number</label>`
-      body += '      </div>'
-      body += '      <span class="mdc-notched-outline__trailing"></span>'
-      body += '    </span>'
-      body += `    <input type="text" class="mdc-text-field__input" style="width: 100%" id="${this.cardId}_phone_value" />`
-      body += '  </label>'
-      body += '</div>'
-
-      body += '<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">'
-      body += `  <label class="mdc-text-field mdc-text-field--outlined mdc-text-field--textarea" id="${this.cardId}_message_field" style="width: 100%">`
-      body += '    <span class="mdc-notched-outline">'
-      body += '      <span class="mdc-notched-outline__leading"></span>'
-      body += '      <div class="mdc-notched-outline__notch">'
-      body += `        <label for="${this.cardId}_message_value" class="mdc-floating-label">Message</label>`
-      body += '      </div>'
-      body += '      <span class="mdc-notched-outline__trailing"></span>'
-      body += '    </span>'
-      body += '    <span class="mdc-text-field__resizer">'
-      body += `      <textarea class="mdc-text-field__input" rows="4" style="width: 100%" id="${this.cardId}_message_value"></textarea>`
-      body += '    </span>'
-      body += '  </label>'
-      body += '</div>'
-
-      body += '<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">'
       body += `  <label class="mdc-text-field mdc-text-field--outlined mdc-text-field--textarea" id="${this.cardId}_value_field" style="width: 100%">`
       body += '    <span class="mdc-notched-outline">'
       body += '      <span class="mdc-notched-outline__leading"></span>'
       body += '      <div class="mdc-notched-outline__notch">'
-      body += `        <label for="${this.cardId}_message_value" class="mdc-floating-label">Value</label>`
+      body += `        <label for="${this.cardId}_value_value" class="mdc-floating-label">Value</label>`
       body += '      </div>'
       body += '      <span class="mdc-notched-outline__trailing"></span>'
       body += '    </span>'
@@ -160,38 +119,6 @@ define(['material', 'cards/node', 'jquery'], function (mdc, Node) {
       body += '    </span>'
       body += '  </label>'
       body += '</div>'
-
-      body += '<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">'
-      body += `<div class="mdc-select mdc-select--outlined" id="${this.cardId}_select_image" style="width: 100%">`
-      body += '  <div class="mdc-select__anchor">'
-      body += '    <span class="mdc-notched-outline">'
-      body += '      <span class="mdc-notched-outline__leading"></span>'
-      body += '      <span class="mdc-notched-outline__notch">'
-      body += '        <span id="outlined-select-label" class="mdc-floating-label">Image</span>'
-      body += '      </span>'
-      body += '      <span class="mdc-notched-outline__trailing"></span>'
-      body += '    </span>'
-      body += '    <span class="mdc-select__selected-text-container">'
-      body += '      <span class="mdc-select__selected-text"></span>'
-      body += '    </span>'
-      body += '    <span class="mdc-select__dropdown-icon">'
-      body += '      <svg class="mdc-select__dropdown-icon-graphic" viewBox="7 10 10 5" focusable="false">'
-      body += '        <polygon class="mdc-select__dropdown-icon-inactive" stroke="none" fill-rule="evenodd" points="7 10 12 15 17 10"></polygon>'
-      body += '        <polygon class="mdc-select__dropdown-icon-active" stroke="none" fill-rule="evenodd" points="7 15 12 10 17 15"></polygon>'
-      body += '      </svg>'
-      body += '    </span>'
-      body += '  </div>'
-      body += '  <div class="mdc-select__menu mdc-menu mdc-menu-surface mdc-menu-surface--fullwidth">'
-      body += `    <ul class="mdc-list" role="listbox" aria-label=Selected Element" id="${this.cardId}_image_list">`
-      body += '      <li class="mdc-list-item" aria-selected="false" data-value="operation-add" role="option">';
-      body += '        <span class="mdc-list-item__ripple"></span>';
-      body += '        <span class="mdc-list-item__text">Last Sent&#8230;</span>';
-      body += '      </li>';
-      body += '    </ul>'
-      body += '  </div>'
-      body += '</div>'
-      body += '</div>'
-
 
       body += '<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-7">'
       body += '  Next:'
@@ -272,107 +199,37 @@ define(['material', 'cards/node', 'jquery'], function (mdc, Node) {
         }
       })
 
-  	  const contactNameField = mdc.textField.MDCTextField.attachTo(document.getElementById(`${this.cardId}_contact_name_field`))
-  	  
-  	  if (this.definition.contact_name !== undefined && this.definition.contact_name !== null) {
-	    contactNameField.value = this.definition.contact_name
-	  }
-
-	  const phoneField = mdc.textField.MDCTextField.attachTo(document.getElementById(`${this.cardId}_phone_field`))
-
-  	  if (this.definition.phone !== undefined && this.definition.phone !== null) {
-	    phoneField.value = this.definition.phone
-	  }
-
 	  const valueField = mdc.textField.MDCTextField.attachTo(document.getElementById(`${this.cardId}_value_field`))
 
   	  if (this.definition.value !== undefined && this.definition.value !== null) {
 	    valueField.value = this.definition.value
 	  }
 
-	  const messageField = mdc.textField.MDCTextField.attachTo(document.getElementById(`${this.cardId}_message_field`))
+      $('#' + this.cardId + '_value_value').on('change keyup paste', function () {
+        const value = $('#' + me.cardId + '_value_value').val()
 
-  	  if (this.definition.message !== undefined && this.definition.message !== null) {
-	    messageField.value = this.definition.message
-	  }
+        me.definition.value = value
 
-      const imageField = mdc.select.MDCSelect.attachTo(document.getElementById(`${me.cardId}_select_image`))
-
-      imageField.listen('MDCSelect:change', () => {
-        const originalImage = me.definition.image
-        me.definition.image = imageField.value
-
-        if (originalImage !== me.definition.image) {
-          me.dialog.markChanged(me.id)
-        }
+        me.dialog.markChanged(me.id)
       })
       
       const updateFieldVisibility = function() {
-	   	console.log(`updateFieldVisibility`)
-	   	console.log(me.definition)
-    
-      	if (me.definition.field == null || me.definition.operation == null || me.definition.operation == 'operation-reset') {
-	      	$(`#${me.cardId}_contact_name_field`).hide()
-	      	$(`#${me.cardId}_phone_field`).hide()
+      	if (me.definition.operation == 'operation-reset') {
 	      	$(`#${me.cardId}_value_field`).hide()
-	      	$(`#${me.cardId}_message_field`).hide()
-	      	$(`#${me.cardId}_select_image`).hide()
-      	} else if (me.definition.operation == 'operation-add') {
-      		const peopleFields = [
-      			'people-distraction',
-      			'people-help',
-      			'provider-medical',
-      			'provider-mental-health'
-      		]
-
-      		const textFields = [
-      			'warning-signs',
-      			'coping-skills',
-      			'crisis-helplines',
-      			'environmental-safety'
-      		]
-
-	    	console.log(`Field: ${me.definition.field}`)
-      		
-      		if (peopleFields.includes(me.definition.field)) {
-		    	console.log(`People field: ${me.definition.field}`)
-		      	$(`#${me.cardId}_contact_name_field`).show()
-		      	$(`#${me.cardId}_phone_field`).show()
-		      	
-		      	$(`#${me.cardId}_value_field`).hide()
-		      	$(`#${me.cardId}_message_field`).hide()
-		      	$(`#${me.cardId}_select_image`).hide()
-		    } else if (textFields.includes(me.definition.field)) {
-		    	console.log(`Text field: ${me.definition.field}`)
-
-		      	$(`#${me.cardId}_message_field`).show()
-
-		      	$(`#${me.cardId}_contact_name_field`).hide()
-		      	$(`#${me.cardId}_phone_field`).hide()
-		      	$(`#${me.cardId}_value_field`).hide()
-		      	$(`#${me.cardId}_select_image`).hide()
-		    } else if (me.definition.field == 'reasons-for-living') {
-		      	$(`#${me.cardId}_message_field`).show()
-		      	$(`#${me.cardId}_select_image`).show()
-
-		      	$(`#${me.cardId}_contact_name_field`).hide()
-		      	$(`#${me.cardId}_phone_field`).hide()
-		      	$(`#${me.cardId}_value_field`).hide()
-		    } else {
-		    	console.log(`Unknown field: ${me.definition.field}`)
-		      	$(`#${me.cardId}_contact_name_field`).hide()
-		      	$(`#${me.cardId}_phone_field`).hide()
-	    	  	$(`#${me.cardId}_value_field`).hide()
-	      		$(`#${me.cardId}_message_field`).hide()
-		      	$(`#${me.cardId}_select_image`).hide()
-		    }
+      	} else {
+			$(`#${me.cardId}_value_field`).show()
       	}
       }
 
       const selectField = mdc.select.MDCSelect.attachTo(document.getElementById(`${me.cardId}_select_element`))
 
+  	  if (this.definition.field !== undefined && this.definition.field !== null) {
+	    selectField.value = this.definition.field
+	  }
+
       selectField.listen('MDCSelect:change', () => {
         const originalField = me.definition.field
+        
         me.definition.field = selectField.value
 
         if (originalField !== me.definition.field) {
@@ -383,6 +240,10 @@ define(['material', 'cards/node', 'jquery'], function (mdc, Node) {
       })
 
       const operationField = mdc.select.MDCSelect.attachTo(document.getElementById(`${me.cardId}_select_operation`))
+
+  	  if (this.definition.operation !== undefined && this.definition.operation !== null) {
+	    operationField.value = this.definition.operation
+	  }
 
       operationField.listen('MDCSelect:change', () => {
         const originalOperation = me.definition.operation
