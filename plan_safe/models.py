@@ -119,7 +119,7 @@ class Participant(models.Model):
 
     def get_absolute_url(self):
         if self.login_token is None or self.login_token == '':
-            self.login_token = get_random_string(length=32)
+            self.login_token = get_random_string(length=32) # nosec
             self.save()
 
         return '%s%s' % (settings.SITE_URL, reverse('plan_safe_safety_plan', args=[self.login_token]))
@@ -612,7 +612,7 @@ class SafetyPlan(models.Model): # pylint: disable=too-many-public-methods
                             image_url = media_item.get('url', None)
 
                             if image_url is not None:
-                                image_response = requests.get(image_url)
+                                image_response = requests.get(image_url, timeout=300)
 
                                 parsed = urlparse(image_url)
 
