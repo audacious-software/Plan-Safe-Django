@@ -56,6 +56,8 @@ class CrisisHelpLine(models.Model):
 
     order_label = models.IntegerField(default=0)
 
+    blurb = models.TextField(null=True, blank=True)
+
     def __str__(self):
         return str(self.name)
 
@@ -165,19 +167,21 @@ class SafetyPlan(models.Model): # pylint: disable=too-many-public-methods
         to_add = []
 
         for new_item in new_items:
-            to_add.append(new_item.strip())
+            to_add.append(str(new_item).strip())
 
         for item in updated_list:
             for new_item in new_items:
-                if isinstance(item, dict):
-                    item_name = item.get('name', '')
+                print('isinstance: %s -- %s' % (isinstance(item, UserDict), type(new_item)))
 
-                    if item_name.strip().lower() == new_item.lower():
-                        to_add.remove(new_item)
+                if isinstance(item, UserDict):
+                    item_name = item.get('value', '')
+
+                    if str(item_name).strip().lower() == str(new_item).lower():
+                        to_add.remove(str(new_item))
 
                         break
 
-                elif item.strip().lower() == new_item.lower():
+                elif str(item).strip().lower() == str(new_item).lower():
                     to_add.remove(new_item)
 
                     break
@@ -191,14 +195,14 @@ class SafetyPlan(models.Model): # pylint: disable=too-many-public-methods
 
         for remove_item in to_remove:
             for item in updated_list:
-                if isinstance(item, dict):
-                    item_name = item.get('name', '')
+                if isinstance(item, UserDict):
+                    item_name = item.get('value', '')
 
-                    if item_name.strip().lower() == remove_item.lower():
+                    if str(item_name).strip().lower() == str(remove_item).lower():
                         while item in new_list:
-                            new_list.remove(item)
+                            new_list.remove(str(item))
 
-                elif item.strip().lower() == remove_item.strip().lower():
+                elif str(item).strip().lower() == str(remove_item).strip().lower():
                     while item in new_list:
                         new_list.remove(item)
 
