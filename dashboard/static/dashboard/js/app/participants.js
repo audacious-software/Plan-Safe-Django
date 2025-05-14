@@ -62,6 +62,14 @@ requirejs(['material', 'cookie', 'moment', 'jquery', 'base'], function (mdc, Coo
     }
   })
 
+  const addParticipantIdentifier = mdc.textField.MDCTextField.attachTo(document.getElementById('new_participant_id'))
+  
+  $('#button_fetch_new_id').click(function (eventObj) {
+    $.get('/dashboard/new-identifier.json', function( data ) {
+  	  addParticipantIdentifier.value = data.identifier
+    })
+  })
+
   $('#button_broadcast_click').attr('disabled', 'true')
 
   $('#button_broadcast_click').click(function (eventObj) {
@@ -177,7 +185,6 @@ requirejs(['material', 'cookie', 'moment', 'jquery', 'base'], function (mdc, Coo
 
   const addParticipantDialog = mdc.dialog.MDCDialog.attachTo(document.getElementById('add_participant_dialog'))
 
-  const addParticipantIdentifier = mdc.textField.MDCTextField.attachTo(document.getElementById('new_participant_id'))
   const addParticipantPhone = mdc.textField.MDCTextField.attachTo(document.getElementById('new_participant_phone'))
   const addParticipantPersonalizedName = mdc.textField.MDCTextField.attachTo(document.getElementById('new_participant_personalized_name'))
 

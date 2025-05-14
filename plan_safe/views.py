@@ -83,7 +83,7 @@ def plan_safe_safety_plan(request, token): # pylint: disable=unused-argument, to
                             'message': 'Success. %s added to warning signs.' % values
                         }
 
-                        return HttpResponse(json.dumps(response_json, indent=2), content_type='application/json', status=204)
+                        return HttpResponse(json.dumps(response_json, indent=2), content_type='application/json', status=200)
 
                     if section == 'coping_skill':
                         safety_plan.add_coping_skills(values)
@@ -92,7 +92,7 @@ def plan_safe_safety_plan(request, token): # pylint: disable=unused-argument, to
                             'message': 'Success. %s added to warning signs.' % values
                         }
 
-                        return HttpResponse(json.dumps(response_json, indent=2), content_type='application/json', status=204)
+                        return HttpResponse(json.dumps(response_json, indent=2), content_type='application/json', status=200)
 
                     if section == 'environmental_safety':
                         safety_plan.add_environmental_safeties(values)
@@ -101,7 +101,7 @@ def plan_safe_safety_plan(request, token): # pylint: disable=unused-argument, to
                             'message': 'Success. %s added to environmental safety.' % values
                         }
 
-                        return HttpResponse(json.dumps(response_json, indent=2), content_type='application/json', status=204)
+                        return HttpResponse(json.dumps(response_json, indent=2), content_type='application/json', status=200)
 
                     if section == 'person_distraction':
                         safety_plan.add_people_distractions(values)
@@ -110,7 +110,7 @@ def plan_safe_safety_plan(request, token): # pylint: disable=unused-argument, to
                             'message': 'Success. %s added to people for distraction.' % values
                         }
 
-                        return HttpResponse(json.dumps(response_json, indent=2), content_type='application/json', status=204)
+                        return HttpResponse(json.dumps(response_json, indent=2), content_type='application/json', status=200)
 
                     if section == 'person_help':
                         safety_plan.add_people_helps(values)
@@ -119,7 +119,7 @@ def plan_safe_safety_plan(request, token): # pylint: disable=unused-argument, to
                             'message': 'Success. %s added to people for help.' % values
                         }
 
-                        return HttpResponse(json.dumps(response_json, indent=2), content_type='application/json', status=204)
+                        return HttpResponse(json.dumps(response_json, indent=2), content_type='application/json', status=200)
 
                     if section == 'person_medical':
                         safety_plan.add_people_medical_providers(values)
@@ -128,7 +128,7 @@ def plan_safe_safety_plan(request, token): # pylint: disable=unused-argument, to
                             'message': 'Success. %s added to medical providers.' % values
                         }
 
-                        return HttpResponse(json.dumps(response_json, indent=2), content_type='application/json', status=204)
+                        return HttpResponse(json.dumps(response_json, indent=2), content_type='application/json', status=200)
 
                     if section == 'person_mental':
                         safety_plan.add_people_mental_health_providers(values)
@@ -137,7 +137,7 @@ def plan_safe_safety_plan(request, token): # pylint: disable=unused-argument, to
                             'message': 'Success. %s added to mental health providers.' % values
                         }
 
-                        return HttpResponse(json.dumps(response_json, indent=2), content_type='application/json', status=204)
+                        return HttpResponse(json.dumps(response_json, indent=2), content_type='application/json', status=200)
 
                 elif action == 'remove':
                     if section == 'warning_sign':
@@ -147,7 +147,7 @@ def plan_safe_safety_plan(request, token): # pylint: disable=unused-argument, to
                             'message': 'Success. %s removed from warning signs.' % values
                         }
 
-                        return HttpResponse(json.dumps(response_json, indent=2), content_type='application/json', status=204)
+                        return HttpResponse(json.dumps(response_json, indent=2), content_type='application/json', status=200)
 
                     if section == 'coping_skill':
                         safety_plan.remove_coping_skills(values)
@@ -156,7 +156,7 @@ def plan_safe_safety_plan(request, token): # pylint: disable=unused-argument, to
                             'message': 'Success. %s removed from coping skills.' % values
                         }
 
-                        return HttpResponse(json.dumps(response_json, indent=2), content_type='application/json', status=204)
+                        return HttpResponse(json.dumps(response_json, indent=2), content_type='application/json', status=200)
 
                     if section == 'environmental_safety':
                         safety_plan.remove_environmental_safeties(values)
@@ -165,7 +165,7 @@ def plan_safe_safety_plan(request, token): # pylint: disable=unused-argument, to
                             'message': 'Success. %s removed from environmental safety.' % values
                         }
 
-                        return HttpResponse(json.dumps(response_json, indent=2), content_type='application/json', status=204)
+                        return HttpResponse(json.dumps(response_json, indent=2), content_type='application/json', status=200)
 
                     if section == 'person_distraction':
                         safety_plan.remove_people_distractions(values)
@@ -174,7 +174,7 @@ def plan_safe_safety_plan(request, token): # pylint: disable=unused-argument, to
                             'message': 'Success. %s removed from people for distraction.' % values
                         }
 
-                        return HttpResponse(json.dumps(response_json, indent=2), content_type='application/json', status=204)
+                        return HttpResponse(json.dumps(response_json, indent=2), content_type='application/json', status=200)
 
                     if section == 'person_help':
                         safety_plan.remove_people_helps(values)
@@ -183,7 +183,7 @@ def plan_safe_safety_plan(request, token): # pylint: disable=unused-argument, to
                             'message': 'Success. %s removed from people for help.' % values
                         }
 
-                        return HttpResponse(json.dumps(response_json, indent=2), content_type='application/json', status=204)
+                        return HttpResponse(json.dumps(response_json, indent=2), content_type='application/json', status=200)
 
                     if section == 'person_medical':
                         safety_plan.remove_people_medical_providers(values)
@@ -192,7 +192,7 @@ def plan_safe_safety_plan(request, token): # pylint: disable=unused-argument, to
                             'message': 'Success. %s removed from medical providers.' % values
                         }
 
-                        return HttpResponse(json.dumps(response_json, indent=2), content_type='application/json', status=204)
+                        return HttpResponse(json.dumps(response_json, indent=2), content_type='application/json', status=200)
 
                     if section == 'person_mental':
                         safety_plan.remove_people_mental_health_providers(values)
@@ -201,7 +201,7 @@ def plan_safe_safety_plan(request, token): # pylint: disable=unused-argument, to
                             'message': 'Success. %s removed from mental health providers.' % values
                         }
 
-                        return HttpResponse(json.dumps(response_json, indent=2), content_type='application/json', status=204)
+                        return HttpResponse(json.dumps(response_json, indent=2), content_type='application/json', status=200)
 
                 elif action == 'update-message':
                     person = request.POST.get('person',  None)
@@ -213,7 +213,7 @@ def plan_safe_safety_plan(request, token): # pylint: disable=unused-argument, to
                             'message': 'Success. Message updated.'
                         }
 
-                        return HttpResponse(json.dumps(response_json, indent=2), content_type='application/json', status=204)
+                        return HttpResponse(json.dumps(response_json, indent=2), content_type='application/json', status=200)
 
                     if section == 'person_help':
                         safety_plan.update_people_help_message(person, value)
@@ -222,7 +222,7 @@ def plan_safe_safety_plan(request, token): # pylint: disable=unused-argument, to
                             'message': 'Success. Message updated.'
                         }
 
-                        return HttpResponse(json.dumps(response_json, indent=2), content_type='application/json', status=204)
+                        return HttpResponse(json.dumps(response_json, indent=2), content_type='application/json', status=200)
 
                     if section == 'person_medical':
                         safety_plan.update_people_medical_message(person, value)
@@ -231,7 +231,7 @@ def plan_safe_safety_plan(request, token): # pylint: disable=unused-argument, to
                             'message': 'Success. Message updated.'
                         }
 
-                        return HttpResponse(json.dumps(response_json, indent=2), content_type='application/json', status=204)
+                        return HttpResponse(json.dumps(response_json, indent=2), content_type='application/json', status=200)
 
                     if section == 'person_mental':
                         safety_plan.update_people_mental_health_message(person, value)
@@ -240,7 +240,47 @@ def plan_safe_safety_plan(request, token): # pylint: disable=unused-argument, to
                             'message': 'Success. Message updated.'
                         }
 
-                        return HttpResponse(json.dumps(response_json, indent=2), content_type='application/json', status=204)
+                        return HttpResponse(json.dumps(response_json, indent=2), content_type='application/json', status=200)
+
+                    if section == 'message_distraction':
+                        safety_plan.message_distraction = value
+                        safety_plan.save()
+
+                        response_json = {
+                            'message': 'Success. Message updated.'
+                        }
+
+                        return HttpResponse(json.dumps(response_json, indent=2), content_type='application/json', status=200)
+
+                    if section == 'message_help':
+                        safety_plan.message_help = value
+                        safety_plan.save()
+
+                        response_json = {
+                            'message': 'Success. Message updated.'
+                        }
+
+                        return HttpResponse(json.dumps(response_json, indent=2), content_type='application/json', status=200)
+
+                    if section == 'message_medical_provider':
+                        safety_plan.message_medical_provider = value
+                        safety_plan.save()
+
+                        response_json = {
+                            'message': 'Success. Message updated.'
+                        }
+
+                        return HttpResponse(json.dumps(response_json, indent=2), content_type='application/json', status=200)
+
+                    if section == 'message_mental_health_provider':
+                        safety_plan.message_mental_health_provider = value
+                        safety_plan.save()
+
+                        response_json = {
+                            'message': 'Success. Message updated.'
+                        }
+
+                        return HttpResponse(json.dumps(response_json, indent=2), content_type='application/json', status=200)
 
                 elif action == 'select-crisis-line':
                     line_pk = int(request.POST.get('line',  '-1'))
@@ -258,7 +298,7 @@ def plan_safe_safety_plan(request, token): # pylint: disable=unused-argument, to
                         'message': 'Success. Line selection updated.'
                     }
 
-                    return HttpResponse(json.dumps(response_json, indent=2), content_type='application/json', status=204)
+                    return HttpResponse(json.dumps(response_json, indent=2), content_type='application/json', status=200)
                 elif action == 'add-reason':
                     value = request.POST.get('value',  '')
 
@@ -297,7 +337,8 @@ def plan_safe_safety_plan(request, token): # pylint: disable=unused-argument, to
             return HttpResponse(json.dumps(response_json, indent=2), content_type='application/json', status=500)
 
     context['user'] = token_user
-    context['crisis_help_lines'] = CrisisHelpLine.objects.all().order_by('order_label')
+    context['crisis_help_lines'] = CrisisHelpLine.objects.filter(is_warmline=False).order_by('order_label')
+    context['warmlines'] = CrisisHelpLine.objects.filter(is_warmline=True).order_by('order_label')
 
     selected_lines = []
 

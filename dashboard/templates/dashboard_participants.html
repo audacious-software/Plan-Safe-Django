@@ -288,16 +288,25 @@
                 </div>
                 <div class="mdc-dialog__content mdc-layout-grid" id="add-participant-content" style="padding-top: 20px;">
                     <div class="mdc-layout-grid__inner">
-                        <label class="mdc-text-field mdc-text-field--outlined mdc-layout-grid__cell mdc-layout-grid__cell--span-6" id="new_participant_id" style="width: 100%;">
-                            <span class="mdc-notched-outline">
-                                <span class="mdc-notched-outline__leading"></span>
-                                <span class="mdc-notched-outline__notch">
-                                    <span class="mdc-floating-label" id="new-participant-name">Participant ID</span>
-                                </span>
-                                <span class="mdc-notched-outline__trailing"></span>
-                            </span>
-                            <input type="text" class="mdc-text-field__input" aria-labelledby="new-participant-name">
-                        </label>
+                        <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-6">
+							<label class="mdc-text-field mdc-text-field--outlined" id="new_participant_id" style="width: 100% - 56px%;">
+								<span class="mdc-notched-outline">
+									<span class="mdc-notched-outline__leading"></span>
+									<span class="mdc-notched-outline__notch">
+										<span class="mdc-floating-label" id="new-participant-name">Participant ID</span>
+									</span>
+									<span class="mdc-notched-outline__trailing"></span>
+								</span>
+								<input type="text" class="mdc-text-field__input" aria-labelledby="new-participant-name">
+							</label>
+							<div style="display: inline-block; height: 56px;">
+								<button class="mdc-icon-button" style="position: relative; top: 6px;" id="button_fetch_new_id">
+									<div class="mdc-icon-button__ripple"></div>
+									<span class="mdc-icon-button__focus-ring"></span>
+									<i class="material-icons">auto_fix_normal</i>
+								</button>
+							</div>
+						</div>
                         <label class="mdc-text-field mdc-text-field--outlined mdc-layout-grid__cell mdc-layout-grid__cell--span-6" id="new_participant_phone" style="width: 100%;">
                             <span class="mdc-notched-outline">
                                 <span class="mdc-notched-outline__leading"></span>

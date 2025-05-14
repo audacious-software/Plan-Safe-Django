@@ -99,8 +99,8 @@
 								<ul class="list-group mb-4">
 									<li class="list-group-item text-bg-light">
 										<strong>People for Distractions</strong>
-										<i class="bi bi-chat-left-fill float-end message-tooltop" data-bs-toggle="tooltip" data-bs-title="TODO"></i>
-									</li>
+										<i class="bi bi-chat-left-fill float-end message-tooltip {% if safety_plan.message_distraction %}bi-chat-left-text-fill{% else %}bi-chat-left{% endif %}" data-bs-toggle="tooltip" data-bs-title="{{ safety_plan.message_distraction }}" data-type="message_distraction"></i>
+									</li> 
 									<li class="list-group-item">
 										<small>
 											Other people, such as family, friends, or acquaintances, can help distract from suicidal thoughts.
@@ -110,7 +110,7 @@
 									{% if people %}
 										{% for person in people %}
 											<li class="list-group-item">
-												{% if person.message %}<i class="bi bi-chat-left-text-fill message-tooltop" data-bs-toggle="tooltip" data-bs-title="{{ person.message }}" data-type="person_distraction" data-value="{{ person.name }}"></i>{% else %}<i class="bi bi-chat-left message-tooltop" data-bs-toggle="tooltip" data-bs-title="(No message available.)" data-type="person_distraction" data-value="{{ person.name }}"></i>{% endif %}
+												{% if person.message %}<i class="bi bi-chat-left-text-fill message-tooltip" data-bs-toggle="tooltip" data-bs-title="{{ person.message }}" data-type="person_distraction" data-value="{{ person.name }}"></i>{% else %}<i class="bi bi-chat-left message-tooltip" data-bs-toggle="tooltip" data-bs-title="(No message available.)" data-type="person_distraction" data-value="{{ person.name }}"></i>{% endif %}
 												{{ person.name }}
 												<a href="#" class="action-delete" data-type="person_distraction" data-value="{{ person.name }}"><i class="bi bi-trash float-end"></i></a>
 											</li>
@@ -137,7 +137,7 @@
 								<ul class="list-group mb-4">
 									<li class="list-group-item text-bg-light">
 										<strong>People for Help</strong>
-										<i class="bi bi-chat-left-fill float-end message-tooltop" data-bs-toggle="tooltip" data-bs-title="TODO"></i>
+										<i class="bi bi-chat-left-fill float-end message-tooltip {% if safety_plan.message_help %}bi-chat-left-text-fill{% else %}bi-chat-left{% endif %}" data-bs-toggle="tooltip" data-bs-title="{{ safety_plan.message_help }}" data-type="message_help"></i>
 									</li>
 									<li class="list-group-item">
 										<small>
@@ -147,7 +147,7 @@
 									{% if people %}
 										{% for person in people %}
 											<li class="list-group-item">
-												{% if person.message %}<i class="bi bi-chat-left-text-fill message-tooltop" data-bs-toggle="tooltip" data-bs-title="{{ person.message }}" data-type="person_help" data-value="{{ person.name }}"></i>{% else %}<i class="bi bi-chat-left message-tooltop" data-bs-toggle="tooltip" data-bs-title="(No message available.)" data-type="person_help" data-value="{{ person.name }}"></i>{% endif %}
+												{% if person.message %}<i class="bi bi-chat-left-text-fill message-tooltip" data-bs-toggle="tooltip" data-bs-title="{{ person.message }}" data-type="person_help" data-value="{{ person.name }}"></i>{% else %}<i class="bi bi-chat-left message-tooltip" data-bs-toggle="tooltip" data-bs-title="(No message available.)" data-type="person_help" data-value="{{ person.name }}"></i>{% endif %}
 												{{ person.name }}
 												<a href="#" class="action-delete" data-type="person_help" data-value="{{ person.name }}"><i class="bi bi-trash float-end"></i></a>
 											</li>
@@ -177,11 +177,38 @@
 								<li class="list-group-item">
 									<small>
 										Crisis helplines are free resources that are available to listen and provide support for people experiencing suicidal crises.
-										They are typically staffed by trained professionals or volunteers who can provide support or guidance and are available 24/7.
+										They are typically staffed by trained professionals or volunteers who can provide support or guidance and <u>most</u> are available 24/7.
 									</small>
 								</li>
 
 								{% for crisis_help_line in crisis_help_lines %}
+									<li class="list-group-item">
+										<input class="form-check-input me-1 crisis_line_check" type="checkbox" value="" id="crisis_help_line_{{ crisis_help_line.order_label }}" data-id="{{ crisis_help_line.order_label }}" {% if crisis_help_line.order_label in selected_help_lines %}checked{% endif %}>
+										<label class="form-check-label" for="crisis_help_line_{{ crisis_help_line.order_label }}">
+											{% if crisis_help_line.website %}
+												<a href="{{ crisis_help_line.website }}" class="text-decoration-none" target="_blank">{{ crisis_help_line.name }}</a>
+											{% else %}
+												{{ crisis_help_line.name }}
+											{% endif %}
+										</label>
+										{% if crisis_help_line.voice_url %}
+											<a class="badge text-bg-primary float-end ms-2 text-decoration-none" href="{{ crisis_help_line.voice_url }}">
+												<i class="bi bi-telephone-fill"></i> {{ crisis_help_line.voice_label }}
+											</a>
+										{% endif %}
+										{% if crisis_help_line.messaging_url %}
+											<a class="badge text-bg-primary float-end ms-2 text-decoration-none" href="{{ crisis_help_line.messaging_url }}">
+												<i class="bi bi-chat-left-fill"></i> {{ crisis_help_line.messaging_label }}
+											</a>
+										{% endif %}
+									</li>
+								{% endfor %}
+								<li class="list-group-item">
+									<small>
+										<strong>Warmlines (Non-Crisis Support)</strong>
+									</small>
+								</li>
+								{% for crisis_help_line in warmlines %}
 									<li class="list-group-item">
 										<input class="form-check-input me-1 crisis_line_check" type="checkbox" value="" id="crisis_help_line_{{ crisis_help_line.order_label }}" data-id="{{ crisis_help_line.order_label }}" {% if crisis_help_line.order_label in selected_help_lines %}checked{% endif %}>
 										<label class="form-check-label" for="crisis_help_line_{{ crisis_help_line.order_label }}">
@@ -214,7 +241,7 @@
 								<ul class="list-group mb-4">
 									<li class="list-group-item text-bg-light">
 										<strong>Medical Providers</strong>
-										<i class="bi bi-chat-left-fill float-end message-tooltop" data-bs-toggle="tooltip" data-bs-title="TODO"></i>
+										<i class="bi bi-chat-left-fill float-end message-tooltip {% if safety_plan.message_medical_provider %}bi-chat-left-text-fill{% else %}bi-chat-left{% endif %}" data-bs-toggle="tooltip"  data-bs-title="{{ safety_plan.message_medical_provider }}" data-type="message_medical_provider"></i>
 									</li>
 									<li class="list-group-item">
 										<small>
@@ -224,7 +251,7 @@
 									{% if people %}
 										{% for person in people %}
 											<li class="list-group-item">
-												{% if person.message %}<i class="bi bi-chat-left-text-fill message-tooltop" data-bs-toggle="tooltip" data-bs-title="{{ person.message }}" data-type="person_medical" data-value="{{ person.name }}"></i>{% else %}<i class="bi bi-chat-left message-tooltop" data-bs-toggle="tooltip" data-bs-title="(No message available.)" data-type="person_medical" data-value="{{ person.name }}"></i>{% endif %}
+												{% if person.message %}<i class="bi bi-chat-left-text-fill message-tooltip" data-bs-toggle="tooltip" data-bs-title="{{ person.message }}" data-type="person_medical" data-value="{{ person.name }}"></i>{% else %}<i class="bi bi-chat-left message-tooltip" data-bs-toggle="tooltip" data-bs-title="(No message available.)" data-type="person_medical" data-value="{{ person.name }}"></i>{% endif %}
 												{{ person.name }}
 												<a href="#" class="action-delete" data-type="person_medical" data-value="{{ person.name }}"><i class="bi bi-trash float-end"></i></a>
 											</li>
@@ -251,7 +278,7 @@
 								<ul class="list-group mb-4">
 									<li class="list-group-item text-bg-light">
 										<strong>Mental Health Providers</strong>
-										<i class="bi bi-chat-left-fill float-end message-tooltop" data-bs-toggle="tooltip" data-bs-title="TODO"></i>
+										<i class="bi bi-chat-left-fill float-end message-tooltip {% if safety_plan.message_mental_health_provider %}bi-chat-left-text-fill{% else %}bi-chat-left{% endif %}" data-bs-toggle="tooltip" data-bs-title="{{ safety_plan.message_mental_health_provider }}" data-type="message_mental_health_provider"></i>
 									</li>
 									<li class="list-group-item">
 										<small>
@@ -261,7 +288,7 @@
 									{% if people %}
 										{% for person in people %}
 											<li class="list-group-item">
-												{% if person.message %}<i class="bi bi-chat-left-text-fill message-tooltop" data-bs-toggle="tooltip" data-bs-title="{{ person.message }}" data-type="person_mental" data-value="{{ person.name }}"></i>{% else %}<i class="bi bi-chat-left message-tooltop" data-bs-toggle="tooltip" data-bs-title="(No message available.)" data-type="person_mental" data-value="{{ person.name }}"></i>{% endif %}
+												{% if person.message %}<i class="bi bi-chat-left-text-fill message-tooltip" data-bs-toggle="tooltip" data-bs-title="{{ person.message }}" data-type="person_mental" data-value="{{ person.name }}"></i>{% else %}<i class="bi bi-chat-left message-tooltip" data-bs-toggle="tooltip" data-bs-title="(No message available.)" data-type="person_mental" data-value="{{ person.name }}"></i>{% endif %}
 												{{ person.name }}
 												<a href="#" class="action-delete" data-type="person_mental" data-value="{{ person.name }}"><i class="bi bi-trash float-end"></i></a>
 											</li>
@@ -347,11 +374,11 @@
 									{% endif %}
 									<li class="list-group-item p-3">
 										<div class="input-group">
-											<button class="btn btn-secondary" type="button" id="button-reason-image">
+											<button class="btn btn-secondary" type="button" id="button-reason-image" data-bs-toggle="tooltip" data-bs-title="Tap to choose image.">
 												<i class="bi bi-image"></i>
 											</button>
-											<input type="text" class="form-control" placeholder="Add a reason for living&#8230;" aria-label="Add an environmental safety&#8230;" aria-describedby="button-reason">
-											<button class="btn btn-secondary" type="button" id="button-reason">
+											<input type="text" class="form-control" placeholder="Add a reason for living&#8230;" aria-label="Add an environmental safety&#8230;" aria-describedby="button-reason" data-bs-toggle="tooltip" data-bs-title="Enter a reason for living." id="reason_field">
+											<button class="btn btn-secondary" type="button" id="button-reason"  data-bs-toggle="tooltip" data-bs-title="Tap to save.">
 												<i class="bi bi-plus"></i>
 											</button>
 										</div>
@@ -436,6 +463,25 @@
 		  </div>
 		</div>
 	</div>
+
+	<div class="modal" tabindex="-1" role="dialog" id="upload_preview_dialog">
+		<div class="modal-dialog">
+		  <div class="modal-content">
+			<div class="modal-header">
+			  <h5 class="modal-title">Use this image?</h5>
+			  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body p-0">
+				<img id="uploaded_image" class="rounded-bottom" style="width: 100%;">
+			</div>
+			<div class="modal-footer">
+			  <button type="button" class="btn btn-primary" id="button_confirm_image">Yes</button>
+			  <button type="button" class="btn btn-secondary" id="button_abandon_image">No</button>
+			</div>
+		  </div>
+		</div>
+	</div>
+
 
 	<script data-main="{% static 'plan_safe/js/app/plan_safe_safety_plan.js' %}" src="{% static 'dashboard/js/vendor/require.js' %}"></script>
 </html>

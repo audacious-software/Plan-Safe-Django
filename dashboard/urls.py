@@ -9,7 +9,7 @@ else:
 
 from .views import dashboard_home, dashboard_dialogs, dashboard_logout, dashboard_create, \
                    dashboard_delete, dashboard_start, dashboard_schedule, dashboard_participants, \
-                   dashboard_participants_broadcast
+                   dashboard_participants_broadcast, dashboard_new_identifier
 
 urlpatterns = [
     url(r'^participants$', dashboard_participants, name='dashboard_participants'),
@@ -20,5 +20,6 @@ urlpatterns = [
     url(r'^schedule$', dashboard_schedule, name='dashboard_schedule'),
     url(r'^dialogs$', dashboard_dialogs, name='dashboard_dialogs'),
     url(r'^logout$', dashboard_logout, name='dashboard_logout'),
+    url(r'^new-identifier.json$', dashboard_new_identifier, name='dashboard_new_identifier'),
     url(r'^$', dashboard_home, name='dashboard_home'),
 ]

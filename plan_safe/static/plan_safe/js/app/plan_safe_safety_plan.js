@@ -197,7 +197,7 @@ requirejs(['cookie', 'bootstrap', 'jquery'], function (Cookies, bootstrap) {
       let newElement = `<li class="list-group-item">${toAdd}<a href="#" class="action-delete" data-type="${elementType}" data-value="${toAdd}"><i class="bi bi-trash float-end"></i></a></li>`
 
       if (elementType.startsWith('person_')) {
-        newElement = `<li class="list-group-item"><i class="bi bi-chat-left message-tooltop" data-bs-toggle="tooltip" data-bs-title="(No message available.)"></i> ${toAdd}<a href="#" class="action-delete" data-type="${elementType}" data-value="${toAdd}"><i class="bi bi-trash float-end"></i></a></li>`
+        newElement = `<li class="list-group-item"><i class="bi bi-chat-left message-tooltip" data-bs-toggle="tooltip" data-bs-title="(No message available.)"></i> ${toAdd}<a href="#" class="action-delete" data-type="${elementType}" data-value="${toAdd}"><i class="bi bi-trash float-end"></i></a></li>`
       }
 
       addItem.before(newElement)
@@ -214,8 +214,6 @@ requirejs(['cookie', 'bootstrap', 'jquery'], function (Cookies, bootstrap) {
     const checked = $(eventObj.target).prop('checked');
     const id = $(eventObj.target).attr('data-id')
 
-    console.log(`CRISIS: ${id} = ${checked}`)
-
     const params = {
       'action': 'select-crisis-line',
       'section': 'crisis_text_lines',
@@ -231,7 +229,7 @@ requirejs(['cookie', 'bootstrap', 'jquery'], function (Cookies, bootstrap) {
   const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
   const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
 
-  $('.message-tooltop').click(function(eventObj) {
+  $('.message-tooltip').click(function(eventObj) {
     eventObj.preventDefault()
 
     let message = $(eventObj.target).attr('data-bs-title')
@@ -256,11 +254,17 @@ requirejs(['cookie', 'bootstrap', 'jquery'], function (Cookies, bootstrap) {
 
       const params = {
         'action': 'update-message',
-        'section': type,
-        'person': who,
         'value': newMessage
       }
+      
+      if (type !== undefined) {
+      	params['section'] = type
+      }
 
+      if (who !== undefined) {
+      	params['person'] = who
+      }
+      
       $.post(window.location.href, params, function(response, status, jqXHR) {
         if (newMessage.trim() !== '') {
           tooltip.addClass('bi-chat-left-text-fill')
@@ -270,6 +274,12 @@ requirejs(['cookie', 'bootstrap', 'jquery'], function (Cookies, bootstrap) {
           tooltip.addClass('bi-chat-left')
         }
 
+	    tooltip.attr('data-bs-title', newMessage)
+       
+        var toUpdate = bootstrap.Tooltip.getInstance(tooltip.get(0));
+
+	    toUpdate.setContent({ '.tooltip-inner': newMessage });  
+        
         $('#helper_message').val('')
 
         $('#message_dialog').modal('hide')
@@ -283,8 +293,12 @@ requirejs(['cookie', 'bootstrap', 'jquery'], function (Cookies, bootstrap) {
     if (eventObj.which === 13) { // 13 is the key code for 'Enter'
       eventObj.preventDefault()
 
-      $(this).parent().find('button').click()
+      $(this).parent().find('#button-reason').click()
     }
+    
+    $(this).tooltip('hide')
+
+    $(this).parent().find('#button-reason').tooltip('show')
   })
 
   $('#button-reason').click(function(eventObj) {
@@ -325,7 +339,7 @@ requirejs(['cookie', 'bootstrap', 'jquery'], function (Cookies, bootstrap) {
         reasonField.val('')
 
         $('#reason_file').val('')
-        $('#button-reason-image').removeClass('btn-dark')
+        $('#button-reason-image').removeClass('btn-success')
         $('#button-reason-image').addClass('btn-secondary')
 
         wireUpDelete()
@@ -338,10 +352,35 @@ requirejs(['cookie', 'bootstrap', 'jquery'], function (Cookies, bootstrap) {
 
     $('#reason_file').click()
   })
+  
+  $('#button_confirm_image').click(function(eventObj) {
+    $('#upload_preview_dialog').modal('hide')
+    
+    window.setTimeout(function() {
+	    // $('#reason_field').tooltip('show')
+    	$('#reason_field').focus()
+    }, 250)
+  })
+
+  $('#button_abandon_image').click(function(eventObj) {
+    $('#reason_file').val('')
+
+    $('#button-reason-image').removeClass('btn-success')
+    $('#button-reason-image').addClass('btn-secondary')
+    
+    $('#upload_preview_dialog').modal('hide')
+  })
 
   $('#reason_file').on('change', function() {
     $('#button-reason-image').removeClass('btn-secondary')
-    $('#button-reason-image').addClass('btn-dark')
+    $('#button-reason-image').addClass('btn-success')
+    
+  	const [file] = $('#reason_file')[0].files
+
+    if (file) {
+      $('#uploaded_image').attr('src', URL.createObjectURL(file))
+      $('#upload_preview_dialog').modal('show')
+	}    
   })
 
   wireUpDelete()

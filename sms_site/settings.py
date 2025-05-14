@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'simple_messaging_dialog_support',
     'simple_messaging_azure',
     'simple_messaging_twilio',
+    'simple_generative_ai',
     'plan_safe',
     'dashboard',
 ]
@@ -143,6 +144,7 @@ LOGIN_REDIRECT_URL = '/dashboard/'
 
 DJANGO_DIALOG_ENGINE_TEMPLATE_LOADS = (
     'simple_messaging_dialog_support',
+    'plan_safe',
 )
 
 SILENCED_SYSTEM_CHECKS = []

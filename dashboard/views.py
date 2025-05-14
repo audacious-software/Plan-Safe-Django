@@ -2,6 +2,7 @@
 
 import datetime
 import json
+import random
 
 import arrow
 import humanize
@@ -58,7 +59,7 @@ def dashboard_home(request):
 def dashboard_dialogs(request):
     context = {}
 
-    query = DialogScript.objects.all().order_by('name')
+    query = DialogScript.objects.exclude(labels__icontains='archived').order_by('name')
 
     context['total'] = query.count()
 
@@ -197,7 +198,7 @@ def dashboard_start(request):
     return HttpResponseBadRequest('Invalid Request', status=405)
 
 @login_required
-def dashboard_schedule(request): # pylint: disable=too-many-locals
+def dashboard_schedule(request): # pylint: disable=too-many-locals, too-many-branches, too-many-statements
     if request.method == 'POST': # pylint: disable=too-many-nested-blocks
         identifier = request.POST.get('identifier', '')
 
@@ -239,35 +240,52 @@ def dashboard_schedule(request): # pylint: disable=too-many-locals
             if phone_number != '':
                 when = max(arrow.get(request.POST.get('date', '')).replace(tzinfo=pytz.timezone(settings.TIME_ZONE)).datetime, timezone.now())
 
-                parsed = phonenumbers.parse(phone_number, settings.PHONE_REGION)
+                destination = None
 
-                destination = phonenumbers.format_number(parsed, phonenumbers.PhoneNumberFormat.E164)
+                original_id = phone_number
 
-                script = DialogScript.objects.filter(identifier=identifier).first()
+                participant = Participant.objects.filter(identifier__iexact=phone_number).first()
 
-                if script is not None:
-                    message = 'dialog:%s' % script.identifier
+                if participant is not None:
+                    phone_number = participant.fetch_phone_number()
 
-                    dialog_options = {}
+                try:
+                    parsed = phonenumbers.parse(phone_number, settings.PHONE_REGION)
 
-                    if interrupt_minutes is not None and interrupt_minutes < 0:
-                        dialog_options['interrupt_minutes'] = interrupt_minutes
+                    destination = phonenumbers.format_number(parsed, phonenumbers.PhoneNumberFormat.E164)
 
-                    if timeout_minutes is not None and timeout_minutes < 0:
-                        dialog_options['timeout_minutes'] = timeout_minutes
+                    script = DialogScript.objects.filter(identifier=identifier).first()
 
-                    if pause_minutes is not None and pause_minutes < 0:
-                        dialog_options['pause_minutes'] = pause_minutes
+                    if script is not None:
+                        message = 'dialog:%s' % script.identifier
 
-                    for variable in dialog_variables:
-                        pair = variable.split('=')
+                        dialog_options = {}
 
-                        if len(pair) > 1:
-                            dialog_options[pair[0].strip()] = pair[1].strip()
+                        if interrupt_minutes is not None and interrupt_minutes < 0:
+                            dialog_options['interrupt_minutes'] = interrupt_minutes
 
-                    outgoing = OutgoingMessage.objects.create(destination=destination, send_date=when, message=message)
-                    outgoing.message_metadata = json.dumps(dialog_options, indent=2)
-                    outgoing.encrypt_destination()
+                        if timeout_minutes is not None and timeout_minutes < 0:
+                            dialog_options['timeout_minutes'] = timeout_minutes
+
+                        if pause_minutes is not None and pause_minutes < 0:
+                            dialog_options['pause_minutes'] = pause_minutes
+
+                        for variable in dialog_variables:
+                            pair = variable.split('=')
+
+                            if len(pair) > 1:
+                                dialog_options[pair[0].strip()] = pair[1].strip()
+
+                        outgoing = OutgoingMessage.objects.create(destination=destination, send_date=when, message=message)
+                        outgoing.message_metadata = json.dumps(dialog_options, indent=2)
+                        outgoing.encrypt_destination()
+                except phonenumbers.phonenumberutil.NumberParseException:
+                    response_json = {
+                        'message': 'Unable to locate participant with identifier "%s". Please check and try again.' % original_id
+                    }
+
+                    return HttpResponse(json.dumps(response_json, indent=2), content_type='application/json')
+
 
         response_json = {
             'message': 'Dialog scheduled successfully.'
@@ -480,3 +498,19 @@ def dashboard_participants_broadcast(request): # pylint: disable=invalid-name
         return HttpResponse(json.dumps(response_json, indent=2), content_type='application/json')
 
     return HttpResponseRedirect(reverse('dashboard_participants'))
+
+def dashboard_new_identifier(request): # pylint: disable=unused-argument
+    identifier = None
+
+    while identifier is None:
+        numeric = '%s' % random.randint(0, 99999999)
+
+        while len(numeric) < 8:
+            numeric = '0' + numeric
+
+        identifier = '%s%s' % (settings.PLAN_SAFE_ID_PREFIX, numeric)
+
+        if Participant.objects.filter(identifier=identifier).count() > 0:
+            identifier = None
+
+    return HttpResponse(json.dumps({'identifier': identifier}, indent=2), content_type='application/json')

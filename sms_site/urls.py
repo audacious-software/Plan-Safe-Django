@@ -34,6 +34,7 @@ urlpatterns = [
     url(r'^messages/', include('simple_messaging.urls')),
     url(r'^dashboard/', include('dashboard.urls')),
     url(r'^quicksilver/', include('quicksilver.urls')),
+    url(r'^generative-ai/', include('simple_generative_ai.urls')),
     url(r'^plan-safe/', include('plan_safe.urls')),
     url(r'^$', RedirectView.as_view(url='/dashboard/')),
 ]
