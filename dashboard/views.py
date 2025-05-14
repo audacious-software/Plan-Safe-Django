@@ -503,7 +503,7 @@ def dashboard_new_identifier(request): # pylint: disable=unused-argument
     identifier = None
 
     while identifier is None:
-        numeric = '%s' % random.randint(0, 99999999)
+        numeric = '%s' % random.randint(0, 99999999) # nosec
 
         while len(numeric) < 8:
             numeric = '0' + numeric

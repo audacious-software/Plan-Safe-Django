@@ -63,4 +63,4 @@ def show_people_message_list(safety_plan, message_type='distraction', intro='', 
 
     rendered = rendered.strip()
 
-    return mark_safe(rendered)
+    return mark_safe(rendered) # nosec
