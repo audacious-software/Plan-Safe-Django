@@ -63,10 +63,10 @@ requirejs(['material', 'cookie', 'moment', 'jquery', 'base'], function (mdc, Coo
   })
 
   const addParticipantIdentifier = mdc.textField.MDCTextField.attachTo(document.getElementById('new_participant_id'))
-  
+
   $('#button_fetch_new_id').click(function (eventObj) {
-    $.get('/dashboard/new-identifier.json', function( data ) {
-  	  addParticipantIdentifier.value = data.identifier
+    $.get('/dashboard/new-identifier.json', function (data) {
+      addParticipantIdentifier.value = data.identifier
     })
   })
 
