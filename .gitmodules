@@ -28,3 +28,6 @@
 [submodule "simple_generative_ai"]
 	path = simple_generative_ai
 	url = https://github.com/audacious-software/Simple-Generative-AI-Django.git
+[submodule "simple_scheduling"]
+	path = simple_scheduling
+	url = https://github.com/audacious-software/Simple-Scheduling-Django.git

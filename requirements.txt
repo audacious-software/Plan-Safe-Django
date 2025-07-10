@@ -9,6 +9,7 @@ wheel
 -r simple_messaging_azure/requirements.txt
 -r simple_messaging_dialog_support/requirements.txt
 -r simple_messaging_twilio/requirements.txt
+-r simple_scheduling/requirements.txt
 
 django-auth-ldap==4.0.0; python_version < '3.7'
 django-auth-ldap==4.1.0; python_version >= '3.7'
