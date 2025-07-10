@@ -7,6 +7,7 @@ from django.conf import settings
 from django.template import engines
 from django.utils import timezone
 from django.utils.crypto import get_random_string
+from django.utils.safestring import mark_safe
 
 from django_dialog_engine.dialog import BaseNode, DialogTransition
 from django_dialog_engine.models import apply_template
@@ -311,7 +312,7 @@ class SendReasonsForLivingNode(BaseNode):
             new_extras = dict(extras)
 
             new_extras['reason'] = {
-                'caption': reason.caption,
+                'caption': mark_safe(reason.caption),
                 'index': reason_index,
             }
 
@@ -390,7 +391,7 @@ class AddReasonsForLivingNode(BaseNode):
 
         django_engine = engines["django"]
 
-        caption_template = django_engine.from_string(self.caption_template)
+        caption_template = django_engine.from_string('{% autoescape off %}' +  self.caption_template + '{% endautoescape %}')
 
         caption = caption_template.render(extras)
 
@@ -398,7 +399,21 @@ class AddReasonsForLivingNode(BaseNode):
 
         media_url = media_url_template.render(extras)
 
-        safety_plan.add_reasons_for_living_from_url(caption, media_url)
+        caption_lines = caption.splitlines()
+
+        if len(caption_lines) > 1:
+            used_media = False
+
+            for caption_line in caption_lines:
+                caption_line = caption_line.strip()
+
+                if caption_line != '':
+                    if used_media is False:
+                        safety_plan.add_reasons_for_living_from_url(caption_line, media_url)
+                    else:
+                        safety_plan.add_reasons_for_living_from_url(caption_line, '')
+        else:
+            safety_plan.add_reasons_for_living_from_url(caption, media_url)
 
         transition = DialogTransition(new_state_id=self.next_node_id)
 
@@ -458,9 +473,13 @@ class AddHelperMessageNode(BaseNode):
         if extras is None:
             extras = {}
 
-        helper_name = apply_template(self.helper_name, extras)
+        name_template = '{% autoescape off %}' + self.helper_name + '{% endautoescape %}'
 
-        helper_message = apply_template(self.helper_message, extras)
+        helper_name = apply_template(name_template, extras)
+
+        message_template = '{% autoescape off %}' + self.helper_message + '{% endautoescape %}'
+
+        helper_message = apply_template(message_template, extras)
 
         safety_plan.add_helper_message(self.helper_type, helper_name, helper_message)
 

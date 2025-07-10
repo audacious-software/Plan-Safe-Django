@@ -329,7 +329,10 @@ class SafetyPlan(models.Model): # pylint: disable=too-many-public-methods, too-m
         if person in ('', None):
             self.message_distraction = message
         else:
-            people = self.people_distraction.splitlines()
+            people = []
+
+            if self.people_distraction is not None and self.people_distraction.strip() != '':
+                people = self.people_distraction.splitlines()
 
             new_people = []
 
@@ -431,7 +434,10 @@ class SafetyPlan(models.Model): # pylint: disable=too-many-public-methods, too-m
         if person in ('', None):
             self.message_help = message
         else:
-            people = self.people_help.splitlines()
+            people = []
+
+            if self.people_help is not None and self.people_help.strip() != '':
+                people = self.people_help.splitlines()
 
             new_people = []
 
@@ -533,7 +539,10 @@ class SafetyPlan(models.Model): # pylint: disable=too-many-public-methods, too-m
         if person in ('', None):
             self.message_medical_provider = message
         else:
-            people = self.people_medical_provider.splitlines()
+            people = []
+
+            if self.people_medical_provider is not None and self.people_medical_provider.strip() != '':
+                people = self.people_medical_provider.splitlines()
 
             new_people = []
 
@@ -635,7 +644,10 @@ class SafetyPlan(models.Model): # pylint: disable=too-many-public-methods, too-m
         if person in ('', None):
             self.message_mental_health_provider = message
         else:
-            people = self.people_mental_health_provider.splitlines()
+            people = []
+
+            if self.people_mental_health_provider is not None and self.people_mental_health_provider.strip() != '':
+                people = self.people_mental_health_provider.splitlines()
 
             new_people = []
 
