@@ -19,8 +19,12 @@
 			<div class="container card mt-3">
 				<div class="card-body">
 					<div class="row">
-						<div class="col-md-12">
+						<div class="col-8">
 							<h3>{{ user }}'s Safety Plan</h3>
+						</div>
+						<div class="col-4">
+							<a href="#settings" class="bi bi-sliders float-end fs-3" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Message Settings"></a>
+							<a href="{% url 'plan_safe_contact_card' user.login_token %}" class="bi bi-person-rolodex float-end fs-3 me-4" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Contact Card"></a>
 						</div>
 						<div class="col-md-4 pt-4">
 							{% with safety_plan.fetch_warning_signs as warning_signs %}
@@ -100,7 +104,7 @@
 									<li class="list-group-item text-bg-light">
 										<strong>People for Distractions</strong>
 										<i class="bi bi-chat-left-fill float-end message-tooltip {% if safety_plan.message_distraction %}bi-chat-left-text-fill{% else %}bi-chat-left{% endif %}" data-bs-toggle="tooltip" data-bs-title="{{ safety_plan.message_distraction }}" data-type="message_distraction"></i>
-									</li> 
+									</li>
 									<li class="list-group-item">
 										<small>
 											Other people, such as family, friends, or acquaintances, can help distract from suicidal thoughts.
@@ -192,12 +196,12 @@
 											{% endif %}
 										</label>
 										{% if crisis_help_line.voice_url %}
-											<a class="badge text-bg-primary float-end ms-2 text-decoration-none" href="{{ crisis_help_line.voice_url }}">
+											<a class="badge text-bg-primary float-end ms-2 text-decoration-none mt-1" href="{{ crisis_help_line.voice_url }}">
 												<i class="bi bi-telephone-fill"></i> {{ crisis_help_line.voice_label }}
 											</a>
 										{% endif %}
 										{% if crisis_help_line.messaging_url %}
-											<a class="badge text-bg-primary float-end ms-2 text-decoration-none" href="{{ crisis_help_line.messaging_url }}">
+											<a class="badge text-bg-primary float-end ms-2 text-decoration-none mt-1" href="{{ crisis_help_line.messaging_url }}">
 												<i class="bi bi-chat-left-fill"></i> {{ crisis_help_line.messaging_label }}
 											</a>
 										{% endif %}
@@ -219,12 +223,12 @@
 											{% endif %}
 										</label>
 										{% if crisis_help_line.voice_url %}
-											<a class="badge text-bg-primary float-end ms-2 text-decoration-none" href="{{ crisis_help_line.voice_url }}">
+											<a class="badge text-bg-primary float-end ms-2 text-decoration-none mt-1" href="{{ crisis_help_line.voice_url }}">
 												<i class="bi bi-telephone-fill"></i> {{ crisis_help_line.voice_label }}
 											</a>
 										{% endif %}
 										{% if crisis_help_line.messaging_url %}
-											<a class="badge text-bg-primary float-end ms-2 text-decoration-none" href="{{ crisis_help_line.messaging_url }}">
+											<a class="badge text-bg-primary float-end ms-2 text-decoration-none mt-1" href="{{ crisis_help_line.messaging_url }}">
 												<i class="bi bi-chat-left-fill"></i> {{ crisis_help_line.messaging_label }}
 											</a>
 										{% endif %}
@@ -409,6 +413,45 @@
 								</ul>
 							{% endwith %}
 						</div>
+
+						<div class="col-md-4 pt-4">
+							<ul class="list-group mb-4">
+								<li class="list-group-item text-bg-light" style="color: #4E2A84 !important;">
+									<a name="settings"></a>
+									<strong>Safety Plan Settings</strong>
+								</li>
+								<li class="list-group-item">
+									<button type="button" class="btn btn-outline-primary float-end mt-1"><i class="bi bi-pencil"></i></button>
+									{{ user.personalized_name }}<br />
+									<small>Preferred Name</small>
+								</li>
+								<li class="list-group-item">
+									<button type="button" class="btn btn-outline-primary float-end mt-1"><i class="bi bi-pencil"></i></button>
+									{{ user.time_zone }}<br />
+									<small>Time Zone</small>
+								</li>
+								<li class="list-group-item">
+									<button type="button" class="btn btn-outline-primary float-end mt-1"><i class="bi bi-pencil"></i></button>
+									{{ user.day_start }}<br />
+									<small>Day Start</small>
+								</li>
+								<li class="list-group-item">
+									<button type="button" class="btn btn-outline-primary float-end mt-1"><i class="bi bi-pencil"></i></button>
+									{{ user.day_end }}<br />
+									<small>Day End</small>
+								</li>
+								<li class="list-group-item">
+									{% if safety_plan.is_paused %}
+										<button type="button" class="btn btn-primary float-end mt-1">Resume</button>
+									{% else %}
+										<button type="button" class="btn btn-primary float-end mt-1">Pause</button>
+									{% endif %}
+									{{ safety_plan.pause_status }}<br />
+									<small>Pause Status</small>
+								</li>
+							</ul>
+						</div>
+
 					</div>
 				</div>
 			</div>

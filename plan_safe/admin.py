@@ -14,11 +14,23 @@ from .models import Participant, TimeZone, StudyArm, SafetyPlan, ReasonForLiving
 @admin.register(Participant)
 class ParticipantAdmin(admin.ModelAdmin):
     list_display = ('identifier', 'fetch_phone_number', 'login_token', 'personalized_name', 'time_zone', 'created', 'updated',)
-    list_filter = ('time_zone', 'created', 'updated',)
+    list_filter = ('active', 'time_zone', 'created', 'updated',)
 
     formfield_overrides = {
         JSONField: {'widget': PrettyJSONWidget(attrs={'initial': 'parsed'})}
     }
+
+    def mark_inactive(self, request, queryset): # pylint: disable=unused-argument, no-self-use
+        queryset.update(active=False)
+
+    mark_inactive.short_description = "Mark selected participants inactive"
+
+    def mark_active(self, request, queryset): # pylint: disable=unused-argument, no-self-use
+        queryset.update(active=True)
+
+    mark_active.short_description = "Mark selected participants active"
+
+    actions = [mark_inactive, mark_active]
 
 @admin.register(TimeZone)
 class TimeZoneAdmin(admin.ModelAdmin):

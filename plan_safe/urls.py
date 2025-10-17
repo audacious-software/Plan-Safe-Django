@@ -7,8 +7,9 @@ if sys.version_info[0] > 2:
 else:
     from django.conf.urls import url
 
-from .views import plan_safe_safety_plan
+from .views import plan_safe_safety_plan, plan_safe_contact_card
 
 urlpatterns = [
     url(r'^safety-plan/(?P<token>.+)$', plan_safe_safety_plan, name='plan_safe_safety_plan'),
+    url(r'^contact/(?P<token>.+)/plan-safe.vcf$', plan_safe_contact_card, name='plan_safe_contact_card'),
 ]

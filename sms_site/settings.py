@@ -39,10 +39,12 @@ INSTALLED_APPS = [
     'quicksilver',
     'simple_dashboard',
     'simple_messaging',
+    'simple_messaging_switchboard',
     'simple_messaging_dialog_support',
     'simple_messaging_azure',
     'simple_messaging_twilio',
     'simple_generative_ai',
+    'simple_research',
     'simple_scheduling',
     'plan_safe',
     'dashboard',
@@ -151,7 +153,16 @@ DJANGO_DIALOG_ENGINE_TEMPLATE_LOADS = (
 
 SILENCED_SYSTEM_CHECKS = []
 
+HIDE_ADMIN_CLASSES = [
+    'simple_research.ResearchParticipation',
+    'simple_research.ResearchParticipant',
+    'simple_research.ResearchStudy',
+]
+
 PLAN_SAFE_EXPIRE_SECONDS = 900
+PLAN_SAFE_CONTROL_DELAY_DAYS = 14
+PLAN_SAFE_CONTROL_DELAY_URL = 'https://www.northwestern.edu'
+
 SIMPLE_DATA_EXPORTER_SITE_NAME = 'Plan Safe'
 
 from .local_settings import *

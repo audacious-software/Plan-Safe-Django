@@ -1,5 +1,6 @@
 # pylint: disable=no-member, line-too-long
 
+import datetime
 import random
 
 from urllib.parse import urlparse
@@ -22,7 +23,8 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.crypto import get_random_string
 
-from simple_messaging.models import encrypt_value, decrypt_value
+from django_dialog_engine.models import DialogScript
+from simple_messaging.models import encrypt_value, decrypt_value, OutgoingMessage
 
 SUPPORTER_ROLES = (
     ('distraction', 'Distraction',),
@@ -72,6 +74,9 @@ class Participant(models.Model):
 
     time_zone = models.ForeignKey(TimeZone, null=True, blank=True, related_name='participants', on_delete=models.SET_NULL)
 
+    day_start = models.TimeField(default=datetime.time(8, 0))
+    day_end = models.TimeField(default=datetime.time(20, 0))
+
     study_arm = models.ForeignKey(StudyArm, null=True, blank=True, related_name='participants', on_delete=models.SET_NULL)
 
     active = models.BooleanField(default=True)
@@ -82,6 +87,11 @@ class Participant(models.Model):
     updated = models.DateTimeField(default=timezone.now)
 
     login_token = models.CharField(max_length=1024, null=True, blank=True)
+
+    def fetch_today_start(self):
+        now = self.translate_to_localtime(timezone.now())
+
+        return now.replace(hour=self.day_start.hour, minute=self.day_start.minute, second=0, microsecond=0)
 
     def obfuscated_phone_number(self):
         return self.fetch_phone_number(obfuscated=True)
@@ -129,6 +139,40 @@ class Participant(models.Model):
             self.save()
 
         return '%s%s' % (settings.SITE_URL, reverse('plan_safe_safety_plan', args=[self.login_token]))
+
+    def days_paused(self):
+        pause_dates = self.metadata.get('pause_dates', [])
+
+        today = self.fetch_today_start().date()
+
+        pause_count = 0
+
+        for date_str in pause_dates:
+            when_date = datetime.date.strptime(date_str, '%Y-%m-%d')
+
+            if when_date <= today:
+                pause_count += 1
+
+        return pause_count
+
+    def fetch_dialogs(self, seen=True):
+        seen_dialogs = []
+
+        for message in  OutgoingMessage.objects.messages_to_destination(self.fetch_phone_number(), include_unsent=(seen is False), since=self.created, message__startswith='dialog:'):
+            script_id = message.message.replace('dialog:', '')
+
+            script = DialogScript.objects.filter(identifier=script_id).first()
+
+            if script is not None:
+                seen_dialogs.append({
+                    'labels': script.labels_list(),
+                    'when': message.send_date,
+                })
+
+        return seen_dialogs
+
+
+
 
 class SafetyPlan(models.Model): # pylint: disable=too-many-public-methods, too-many-instance-attributes
     participant = models.ForeignKey(Participant, null=True, blank=True, related_name='safety_plans', on_delete=models.SET_NULL)
@@ -737,7 +781,7 @@ class SafetyPlan(models.Model): # pylint: disable=too-many-public-methods, too-m
         if avoid_repeats:
             if len(reasons) >= sample_count:
                 if sequential is False:
-                    sampled = random.sample(seen, k=(sample_count - len(unseen)))
+                    sampled = random.sample(seen, k=(sample_count - len(unseen))) # pylint: disable=superfluous-parens
                 else:
                     sampled = seen[:(sample_count - len(unseen))]
 
@@ -875,6 +919,38 @@ class SafetyPlan(models.Model): # pylint: disable=too-many-public-methods, too-m
 
     def reset_crisis_help_line(self):
         self.crisis_help_lines.clear()
+
+    def pause_status(self):
+        if self.is_paused():
+            return 'Not paused'
+
+        return 'Paused'
+
+    def is_paused(self):
+        pause_dates = self.participant.metadata.get('pause_dates', [])
+
+        now = timezone.now()
+
+        today = self.participant.translate_to_localtime(now).date().isoformat()
+
+        return (today in pause_dates) # pylint: disable=superfluous-parens
+
+    def pause_dates(self, include_future=False):
+        now = timezone.now()
+
+        today = self.participant.translate_to_localtime(now).date().isoformat()
+
+        to_return = []
+
+        for date_str in self.participant.metadata.get('pause_dates', []):
+            if date_str < today:
+                to_return.append(date_str)
+            elif date_str == today:
+                to_return.append(date_str)
+            elif include_future:
+                to_return.append(date_str)
+
+        return to_return
 
 @receiver(pre_save, sender=SafetyPlan)
 def pre_save_user(sender, instance, **kwargs): # pylint: disable=unused-argument

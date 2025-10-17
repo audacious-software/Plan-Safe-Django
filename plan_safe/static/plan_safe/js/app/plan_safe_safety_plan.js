@@ -256,7 +256,7 @@ requirejs(['cookie', 'bootstrap', 'jquery'], function (Cookies, bootstrap) {
         'action': 'update-message',
         'value': newMessage
       }
-      
+
       if (type !== undefined) {
       	params['section'] = type
       }
@@ -264,7 +264,7 @@ requirejs(['cookie', 'bootstrap', 'jquery'], function (Cookies, bootstrap) {
       if (who !== undefined) {
       	params['person'] = who
       }
-      
+
       $.post(window.location.href, params, function(response, status, jqXHR) {
         if (newMessage.trim() !== '') {
           tooltip.addClass('bi-chat-left-text-fill')
@@ -275,11 +275,11 @@ requirejs(['cookie', 'bootstrap', 'jquery'], function (Cookies, bootstrap) {
         }
 
 	    tooltip.attr('data-bs-title', newMessage)
-       
+
         var toUpdate = bootstrap.Tooltip.getInstance(tooltip.get(0));
 
-	    toUpdate.setContent({ '.tooltip-inner': newMessage });  
-        
+	    toUpdate.setContent({ '.tooltip-inner': newMessage });
+
         $('#helper_message').val('')
 
         $('#message_dialog').modal('hide')
@@ -295,7 +295,7 @@ requirejs(['cookie', 'bootstrap', 'jquery'], function (Cookies, bootstrap) {
 
       $(this).parent().find('#button-reason').click()
     }
-    
+
     $(this).tooltip('hide')
 
     $(this).parent().find('#button-reason').tooltip('show')
@@ -352,10 +352,10 @@ requirejs(['cookie', 'bootstrap', 'jquery'], function (Cookies, bootstrap) {
 
     $('#reason_file').click()
   })
-  
+
   $('#button_confirm_image').click(function(eventObj) {
     $('#upload_preview_dialog').modal('hide')
-    
+
     window.setTimeout(function() {
 	    // $('#reason_field').tooltip('show')
     	$('#reason_field').focus()
@@ -367,21 +367,23 @@ requirejs(['cookie', 'bootstrap', 'jquery'], function (Cookies, bootstrap) {
 
     $('#button-reason-image').removeClass('btn-success')
     $('#button-reason-image').addClass('btn-secondary')
-    
+
     $('#upload_preview_dialog').modal('hide')
   })
 
   $('#reason_file').on('change', function() {
     $('#button-reason-image').removeClass('btn-secondary')
     $('#button-reason-image').addClass('btn-success')
-    
+
   	const [file] = $('#reason_file')[0].files
 
     if (file) {
       $('#uploaded_image').attr('src', URL.createObjectURL(file))
       $('#upload_preview_dialog').modal('show')
-	}    
+	}
   })
+
+  $('[data-bs-toggle="tooltip"]').tooltip()
 
   wireUpDelete()
 })

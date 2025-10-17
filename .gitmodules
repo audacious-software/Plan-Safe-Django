@@ -31,3 +31,9 @@
 [submodule "simple_scheduling"]
 	path = simple_scheduling
 	url = https://github.com/audacious-software/Simple-Scheduling-Django.git
+[submodule "simple_messaging_switchboard"]
+	path = simple_messaging_switchboard
+	url = https://github.com/audacious-software/Simple-Messaging-Switchboard.git
+[submodule "simple_research"]
+	path = simple_research
+	url = https://github.com/audacious-software/Simple-Research-Django.git

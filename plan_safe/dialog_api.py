@@ -5,12 +5,14 @@ import traceback
 
 from django.conf import settings
 from django.template import engines
+from django.urls import reverse
 from django.utils import timezone
 from django.utils.crypto import get_random_string
 from django.utils.safestring import mark_safe
 
-from django_dialog_engine.dialog import BaseNode, DialogTransition
-from django_dialog_engine.models import apply_template
+from django_dialog_engine.dialog import BaseNode, DialogTransition, DialogMachine
+
+from django_dialog_engine.models import DialogScript, apply_template
 
 from .models import Participant, SafetyPlan, CrisisHelpLine
 
@@ -527,6 +529,8 @@ def fetch_destination_variables(destination):
 
             variables['plan_safe_safety_plan_url'] = participant.get_absolute_url()
 
+            variables['plan_safe_contact_card_url'] = 'https://%s%s' % (settings.ALLOWED_HOSTS[0], reverse('plan_safe_contact_card', args=[participant.login_token]))
+
             safety_plan = participant.safety_plans.order_by('-created').first()
 
             if safety_plan is None:
@@ -536,6 +540,9 @@ def fetch_destination_variables(destination):
             variables['safety_plan'] = safety_plan
 
             variables['crisis_lines'] = CrisisHelpLine.objects.all().order_by('order_label')
+
+            variables['is_control'] = participant.metadata.get('is_control', False)
+            variables['personal_url_enabled'] = (variables['is_control'] is False) # pylint: disable=superfluous-parens
 
     if participant_found is False:
         now = timezone.now()
@@ -554,3 +561,29 @@ def fetch_destination_variables(destination):
         return fetch_destination_variables(destination)
 
     return variables
+
+def initialize_dialog(dialog):
+    if dialog.script is not None and 'embed-dialogs' in dialog.script.labels_list():
+        embeds = ('safety-plan-now', 'menu-060525')
+
+        original_nodes = dialog.dialog_snapshot
+
+        for embed in embeds:
+            embed_script = DialogScript.objects.filter(identifier=embed, embeddable=True).first()
+
+            if embed_script is not None:
+                machine = DialogMachine(embed_script.definition)
+
+                prefix = '%s___%s__' % (dialog.script.identifier, embed_script.identifier)
+
+                machine.prefix_nodes(prefix)
+
+                embed_nodes = machine.dialog_definition()
+
+                for node in embed_nodes:
+                    if (node['type'] in ('begin', 'end',)) is False:
+                        original_nodes.append(node)
+
+        dialog.dialog_snapshot = original_nodes
+
+        dialog.save()

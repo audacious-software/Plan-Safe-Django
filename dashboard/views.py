@@ -425,7 +425,7 @@ def dashboard_participants(request): # pylint: disable=too-many-locals, too-many
 
     context['first_page'] = '%s?page=%s&size=%s' % (base_url, 0, page_size)
 
-    context['last_page'] = '%s?page=%s&size=%s' % (base_url, context['total'] / page_size, page_size)
+    context['last_page'] = '%s?page=%s&size=%s' % (base_url, context['total'] // page_size, page_size)
 
     if page_size == -1:
         context['last_page'] = '%s?page=%s&size=%s' % (base_url, 0, page_size)

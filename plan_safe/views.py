@@ -8,6 +8,9 @@ import phonenumbers
 from django.conf import settings
 from django.http import HttpResponse, Http404
 from django.shortcuts import render, redirect
+from django.template.loader import render_to_string
+from django.urls import reverse
+from django.utils import timezone
 
 from .models import Participant, CrisisHelpLine, ReasonForLiving
 
@@ -24,6 +27,18 @@ def plan_safe_safety_plan(request, token): # pylint: disable=unused-argument, to
 
     if token_user is None:
         raise Http404
+
+    if token_user.metadata.get('is_control', False):
+        now = timezone.now()
+
+        start_date = token_user.translate_to_localtime(token_user.created).date()
+
+        today = token_user.translate_to_localtime(now).date()
+
+        day_index = (today - start_date).days - settings.PLAN_SAFE_CONTROL_DELAY_DAYS
+
+        if day_index < 0:
+            return redirect(settings.PLAN_SAFE_CONTROL_DELAY_URL, token=token)
 
     now_timestamp = int(time.time())
 
@@ -351,3 +366,21 @@ def plan_safe_safety_plan(request, token): # pylint: disable=unused-argument, to
     context['project_name'] = settings.SIMPLE_DATA_EXPORTER_SITE_NAME
 
     return render(request, 'plan_safe_safety_plan.html', context=context)
+
+def plan_safe_contact_card(request, token): # pylint: disable=unused-argument, too-many-branches, too-many-locals, too-many-return-statements, too-many-statements
+    if token.endswith('.'):
+        return redirect('plan_safe_safety_plan', token=token[:-1])
+
+    token_user = Participant.objects.exclude(login_token=None).exclude(login_token='').filter(login_token=token).first() # nosec
+
+    if token_user is None:
+        raise Http404
+
+    context = {
+        'safety_plan_url': '%s%s' % (settings.SITE_URL, reverse('plan_safe_safety_plan', args=[token]),),
+        'safety_plan_phone_number': settings.SIMPLE_MESSAGING_TWILIO_PHONE_NUMBER
+    }
+
+    contact_card = render_to_string('plan_safe_contact_card.vcf', context)
+
+    return HttpResponse(contact_card, content_type='text/vcard', status=200)
