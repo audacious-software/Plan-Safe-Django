@@ -796,7 +796,7 @@ class SafetyPlan(models.Model): # pylint: disable=too-many-public-methods, too-m
         if avoid_repeats:
             if len(reasons) >= sample_count:
                 if sequential is False:
-                    sampled = random.sample(seen, k=(sample_count - len(unseen))) # pylint: disable=superfluous-parens
+                    sampled = random.sample(seen, k=(sample_count - len(unseen))) # pylint: disable=superfluous-parens # nosec
                 else:
                     sampled = seen[:(sample_count - len(unseen))]
 

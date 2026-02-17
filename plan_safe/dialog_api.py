@@ -345,7 +345,7 @@ class SendReasonsForLivingNode(BaseNode):
             new_extras = dict(extras)
 
             new_extras['reason'] = {
-                'caption': mark_safe(reason.caption),
+                'caption': mark_safe(reason.caption), # nosec
                 'index': reason_index,
             }
 
