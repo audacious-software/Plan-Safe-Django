@@ -257,7 +257,6 @@ requirejs(['material', 'cookie', 'moment', 'jquery', 'base'], function (mdc, Coo
     $('input[name="update_participant_timezone"][value="' + $(this).attr('data-time-zone') + '"]').attr('checked', true)
     $('input[name="update_participant_study_arm"][value="' + $(this).attr('data-study-arm') + '"]').attr('checked', true)
 
-
     updateParticipantDialog.open()
   })
 
