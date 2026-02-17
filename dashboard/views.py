@@ -307,6 +307,9 @@ def dashboard_participants(request): # pylint: disable=too-many-locals, too-many
         time_zone = request.POST.get('time_zone', '')
         study_arm = request.POST.get('study_arm', '')
 
+        start_time = request.POST.get('start_time', '07:00')
+        end_time = request.POST.get('end_time', '22:00')
+
         if '' in [identifier, phone_number, personalized_name, time_zone, study_arm]:
             response_json = {
                 'message': 'Please complete all the fields to proceed.',
@@ -350,6 +353,8 @@ def dashboard_participants(request): # pylint: disable=too-many-locals, too-many
             participant.phone_number = phone_number
             participant.time_zone = TimeZone.objects.get(name=time_zone)
             participant.study_arm = StudyArm.objects.get(identifier=study_arm)
+            participant.day_start = datetime.datetime.strptime(start_time, '%H:%M').time()
+            participant.day_end = datetime.datetime.strptime(end_time, '%H:%M').time()
             participant.personalized_name = personalized_name
 
         participant.save()

@@ -81,7 +81,7 @@ class Participant(models.Model):
 
     active = models.BooleanField(default=True)
 
-    metadata = models.JSONField(default=dict)
+    metadata = models.JSONField(default=dict, blank=True)
 
     created = models.DateTimeField(default=timezone.now)
     updated = models.DateTimeField(default=timezone.now)
@@ -155,6 +155,15 @@ class Participant(models.Model):
 
         return pause_count
 
+    def is_paused(self):
+        pause_dates = self.metadata.get('pause_dates', [])
+
+        now = timezone.now()
+
+        today = self.translate_to_localtime(now).date().isoformat()
+
+        return (today in pause_dates) # pylint: disable=superfluous-parens
+
     def fetch_dialogs(self, seen=True):
         seen_dialogs = []
 
@@ -165,14 +174,20 @@ class Participant(models.Model):
 
             if script is not None:
                 seen_dialogs.append({
+                    'identifier': script.identifier,
                     'labels': script.labels_list(),
                     'when': message.send_date,
                 })
 
         return seen_dialogs
 
+    def local_time(self, when):
+        here_tz = pytz.timezone(self.time_zone.name)
 
+        if when.tzinfo is None:
+            return here_tz.localize(when)
 
+        return when.astimezone(here_tz)
 
 class SafetyPlan(models.Model): # pylint: disable=too-many-public-methods, too-many-instance-attributes
     participant = models.ForeignKey(Participant, null=True, blank=True, related_name='safety_plans', on_delete=models.SET_NULL)
@@ -878,7 +893,7 @@ class SafetyPlan(models.Model): # pylint: disable=too-many-public-methods, too-m
     def add_crisis_help_lines(self, crisis_help_lines):
         line_labels = []
 
-        for help_line in crisis_help_lines:
+        for help_line in crisis_help_lines: # pylint: disable=too-many-nested-blocks
             tokens = str(help_line).split()
 
             for token in tokens:
@@ -891,6 +906,15 @@ class SafetyPlan(models.Model): # pylint: disable=too-many-public-methods, too-m
 
                     if existing_line is not None:
                         self.crisis_help_lines.add(existing_line)
+                    else:
+                        for char_label in line_label: # Note - only works on single digits. Need more sophisticated for more digits.
+                            try:
+                                existing_line = CrisisHelpLine.objects.filter(order_label=int(char_label)).first()
+
+                                if existing_line is not None:
+                                    self.crisis_help_lines.add(existing_line)
+                            except ValueError:
+                                pass # Not found
                 except ValueError:
                     pass # Not found
 
@@ -927,13 +951,7 @@ class SafetyPlan(models.Model): # pylint: disable=too-many-public-methods, too-m
         return 'Paused'
 
     def is_paused(self):
-        pause_dates = self.participant.metadata.get('pause_dates', [])
-
-        now = timezone.now()
-
-        today = self.participant.translate_to_localtime(now).date().isoformat()
-
-        return (today in pause_dates) # pylint: disable=superfluous-parens
+        return self.participant.is_paused()
 
     def pause_dates(self, include_future=False):
         now = timezone.now()

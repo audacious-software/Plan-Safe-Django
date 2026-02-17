@@ -92,7 +92,7 @@
 												{% endif %}
 											{% endwith %}
 	                                    </td>
-	                                        	
+
                                         <td class="mdc-data-table__cell">
                                         	<center>
 												{% if participant.active %}
@@ -104,7 +104,7 @@
                                         </td>
 
 										<td class="mdc-data-table__cell" style="text-align: center;">
-											<button class="mdc-icon-button mdc-icon-button--touch material-icons update_user" data-user-id="{{ participant.identifier }}" data-phone="{{ participant.fetch_phone_number }}" data-personalized-name="{{ participant.personalized_name }}" data-time-zone="{{ participant.time_zone.name }}" data-study-arm="{{ participant.study_arm.identifier }}">
+											<button class="mdc-icon-button mdc-icon-button--touch material-icons update_user" data-user-id="{{ participant.identifier }}" data-phone="{{ participant.fetch_phone_number }}" data-personalized-name="{{ participant.personalized_name }}" data-time-zone="{{ participant.time_zone.name }}" data-study-arm="{{ participant.study_arm.identifier }}" data-start-time="{{ participant.day_start.isoformat }}" data-end-time="{{ participant.day_end.isoformat }}">
 												<div class="mdc-icon-button__ripple"></div>
 												mode_edit_outline
 											</button>
@@ -227,7 +227,7 @@
 			<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
 				<div class="mdc-typography--headline6"><strong>Broadcast message to selected participants</strong></div>
 			</div>
-		
+
 			<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
 				<label class="mdc-text-field mdc-text-field--outlined mdc-text-field--textarea mdc-text-field--no-label" id="broadcast_message_field" style="width: 100%;">
 					<span class="mdc-notched-outline">
@@ -260,7 +260,7 @@
 					<span class="mdc-button__focus-ring"></span>
 					<i class="material-icons mdc-button__icon" aria-hidden="true">attach_file</i>
 					<span class="mdc-button__label">Attach File</span>
-				</button>			
+				</button>
 				<button class="mdc-button mdc-button--raised" id="button_broadcast_click" style="height: 56px;">
 					<span class="mdc-button__ripple"></span>
 					<span class="mdc-button__focus-ring"></span>
@@ -317,7 +317,7 @@
                             </span>
                             <input type="text" class="mdc-text-field__input" aria-labelledby="new-participant-phone">
                         </label>
-                        <label class="mdc-text-field mdc-text-field--outlined mdc-layout-grid__cell mdc-layout-grid__cell--span-6" id="new_participant_personalized_name" style="width: 100%;">
+                        <label class="mdc-text-field mdc-text-field--outlined mdc-layout-grid__cell mdc-layout-grid__cell--span-12" id="new_participant_personalized_name" style="width: 100%;">
                             <span class="mdc-notched-outline">
                                 <span class="mdc-notched-outline__leading"></span>
                                 <span class="mdc-notched-outline__notch">
@@ -327,7 +327,29 @@
                             </span>
                             <input type="text" class="mdc-text-field__input" aria-labelledby="new-participant-personalized-name">
                         </label>
-                        
+
+                        <label class="mdc-text-field mdc-text-field--outlined mdc-layout-grid__cell--span-6" id="new_participant_start_time" style="width: 100%;">
+                            <span class="mdc-notched-outline">
+                                <span class="mdc-notched-outline__leading"></span>
+                                <span class="mdc-notched-outline__notch">
+                                    <span class="mdc-floating-label" id="start_time_label">Day start time</span>
+                                </span>
+                                <span class="mdc-notched-outline__trailing"></span>
+                            </span>
+                            <input type="time" class="mdc-text-field__input" aria-labelledby="start_time_label">
+                        </label>
+
+                        <label class="mdc-text-field mdc-text-field--outlined mdc-layout-grid__cell--span-6" id="new_participant_end_time" style="width: 100%;">
+                            <span class="mdc-notched-outline">
+                                <span class="mdc-notched-outline__leading"></span>
+                                <span class="mdc-notched-outline__notch">
+                                    <span class="mdc-floating-label" id="end_time_label">Day end time</span>
+                                </span>
+                                <span class="mdc-notched-outline__trailing"></span>
+                            </span>
+                            <input type="time" class="mdc-text-field__input" aria-labelledby="end_time_label">
+                        </label>
+
                         <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
                             <p class="mdc-typography--subtitle2" style="margin: 0px;">Study Arm</p>
                         </div>
@@ -342,7 +364,7 @@
                                     <div class="mdc-radio__ripple"></div>
                                 </div>
                                 <label for="radio-1">{{ study_arm.name }}</label>
-                            </div>                      
+                            </div>
                         {% endfor %}
                     </div>
                     <div class="mdc-layout-grid__inner" style="margin-top: 16px;">
@@ -362,7 +384,7 @@
                                     <div class="mdc-radio__ripple"></div>
                                 </div>
                                 <label for="radio-1">{{ time_zone.friendly_name }}</label>
-                            </div>                      
+                            </div>
                         {% endfor %}
                     </div>
                 </div>
@@ -390,7 +412,7 @@
                     </h2>
                 </div>
                 <div class="mdc-dialog__content" id="delete-dialog-content" style="padding-top: 20px;">
-                    <span class="mdc-typography mdc-typography--body1">Are you sure you want to delete <strong id="delete_dialog_name">XXX</strong>? 
+                    <span class="mdc-typography mdc-typography--body1">Are you sure you want to delete <strong id="delete_dialog_name">XXX</strong>?
                     <input type="hidden" id="delete_dialog_id">
                 </div>
                 <div class="mdc-dialog__actions">
@@ -450,7 +472,7 @@
                         </label>
                     </div>
                     <div class="mdc-layout-grid__inner" style="margin-top: 30px;">
-                        <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-5">
+                        <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-4">
                             <p class="mdc-typography--subtitle2" style="margin: 0px; padding-left: 10px;">Study Arm</p>
 		                    <div class="mdc-layout-grid__inner" style="row-gap: 0;">
                                 {% for study_arm in study_arms %}
@@ -464,15 +486,15 @@
                                             <div class="mdc-radio__ripple"></div>
                                         </div>
                                         <label for="radio-1">{{ study_arm.name }}</label>
-                                    </div>                      
+                                    </div>
                                 {% endfor %}
                             </div>
                         </div>
-                        <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-5">
+                        <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-4">
                             <p class="mdc-typography--subtitle2" style="margin: 0px; padding-left: 10px;">Time Zone</p>
 		                    <div class="mdc-layout-grid__inner" style="row-gap: 0;">
 								{% for time_zone in time_zones %}
-									<div class="mdc-form-field mdc-layout-grid__cell mdc-layout-grid__cell--span-4">
+									<div class="mdc-form-field mdc-layout-grid__cell mdc-layout-grid__cell--span-6">
 										<div class="mdc-radio">
 											<input class="mdc-radio__native-control" type="radio" value="{{ time_zone.name }}" name="update_participant_timezone">
 											<div class="mdc-radio__background">
@@ -482,10 +504,34 @@
 											<div class="mdc-radio__ripple"></div>
 										</div>
 										<label for="radio-1">{{ time_zone.friendly_name }}</label>
-									</div>                      
+									</div>
 								{% endfor %}
 		                    </div>
         	            </div>
+
+                        <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-4">
+                            <label class="mdc-text-field mdc-text-field--outlined" id="update_participant_start_time" style="width: 100%;">
+                                <span class="mdc-notched-outline">
+                                    <span class="mdc-notched-outline__leading"></span>
+                                    <span class="mdc-notched-outline__notch">
+                                        <span class="mdc-floating-label" id="start_time_label">Day start time</span>
+                                    </span>
+                                    <span class="mdc-notched-outline__trailing"></span>
+                                </span>
+                                <input type="time" class="mdc-text-field__input" aria-labelledby="start_time_label">
+                            </label>
+
+                            <label class="mdc-text-field mdc-text-field--outlined mdc-layout-grid__cell--span-6" id="update_participant_end_time" style="width: 100%; margin-top: 32px;">
+                                <span class="mdc-notched-outline">
+                                    <span class="mdc-notched-outline__leading"></span>
+                                    <span class="mdc-notched-outline__notch">
+                                        <span class="mdc-floating-label" id="end_time_label">Day end time</span>
+                                    </span>
+                                    <span class="mdc-notched-outline__trailing"></span>
+                                </span>
+                                <input type="time" class="mdc-text-field__input" aria-labelledby="end_time_label">
+                            </label>
+                        </div>
                     </div>
                 </div>
                 <div class="mdc-dialog__actions">

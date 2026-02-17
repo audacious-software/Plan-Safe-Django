@@ -74,7 +74,7 @@ define(['material', 'cards/node', 'jquery'], function (mdc, Node) {
       body += '    <span class="mdc-notched-outline">'
       body += '      <span class="mdc-notched-outline__leading"></span>'
       body += '      <div class="mdc-notched-outline__notch">'
-      body += `        <label for="${this.cardId}_variable_value" class="mdc-floating-label">Message</label>`
+      body += `        <label for="${this.cardId}_message_value" class="mdc-floating-label">Message</label>`
       body += '      </div>'
       body += '      <span class="mdc-notched-outline__trailing"></span>'
       body += '    </span>'
@@ -168,10 +168,10 @@ define(['material', 'cards/node', 'jquery'], function (mdc, Node) {
 	  }
 
       $('#' + this.cardId + '_message_value').on('change keyup paste', function () {
-        const value = $('#' + me.cardId + '_variable_value').val()
+        const value = $('#' + me.cardId + '_message_value').val()
 
         me.definition.message_template = value
-        
+
         console.log(me.definition)
 
         me.dialog.markChanged(me.id)
@@ -217,7 +217,7 @@ define(['material', 'cards/node', 'jquery'], function (mdc, Node) {
 
       modeField.listen('MDCSelect:change', () => {
         const originalMode = me.definition.mode
-        
+
         me.definition.mode = modeField.value
 
         if (originalMode !== me.definition.mode) {
@@ -266,7 +266,7 @@ define(['material', 'cards/node', 'jquery'], function (mdc, Node) {
 
     issues () {
       const issues = super.issues()
-      
+
       if (this.definition.next_id === undefined) {
         issues.push([this.definition.id, 'Next node does not point to another node.', this.definition.name])
       } else if (this.definition.next_id === this.definition.id) {

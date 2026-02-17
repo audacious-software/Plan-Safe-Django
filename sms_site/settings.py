@@ -154,14 +154,15 @@ DJANGO_DIALOG_ENGINE_TEMPLATE_LOADS = (
 SILENCED_SYSTEM_CHECKS = []
 
 HIDE_ADMIN_CLASSES = [
-    'simple_research.ResearchParticipation',
-    'simple_research.ResearchParticipant',
-    'simple_research.ResearchStudy',
+    # 'simple_research.ResearchParticipation',
+    # 'simple_research.ResearchParticipant',
+    # 'simple_research.ResearchStudy',
 ]
 
 PLAN_SAFE_EXPIRE_SECONDS = 900
-PLAN_SAFE_CONTROL_DELAY_DAYS = 14
+PLAN_SAFE_CONTROL_DELAY_DAYS = 28
 PLAN_SAFE_CONTROL_DELAY_URL = 'https://www.northwestern.edu'
+PLAN_SAFE_MINIMUM_WINDOW_HOURS = 10
 
 SIMPLE_DATA_EXPORTER_SITE_NAME = 'Plan Safe'
 
