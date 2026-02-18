@@ -1,6 +1,8 @@
 # pylint: disable=no-member, line-too-long, fixme
 
+import datetime
 import json
+import logging
 import traceback
 
 from django.conf import settings
@@ -46,6 +48,15 @@ class UpdateSafetyPlanNode(BaseNode):
             self.value = value.splitlines()
         else:
             self.value = []
+
+    def node_definition(self):
+        node_def = super().node_definition() # pylint: disable=missing-super-argument
+
+        node_def['field'] = self.field
+        node_def['operation'] = self.operation
+        node_def['value'] = '\n'.join(self.value)
+
+        return node_def
 
     def node_type(self):
         return 'plan-safe-update-safety-plan'
@@ -185,11 +196,21 @@ class FetchReasonsForLivingNode(BaseNode):
             'next_id': self.next_node_id,
             'empty_id': self.empty_node_id,
             'variable': self.variable,
-            'sample_count': self.sample_count,
+            'count': self.sample_count,
             'avoid_repeats': self.avoid_repeats,
         }
 
         return json.dumps(definition, indent=2)
+
+    def node_definition(self):
+        node_def = super().node_definition() # pylint: disable=missing-super-argument
+
+        node_def['empty_id'] = self.empty_node_id
+        node_def['variable'] = self.variable
+        node_def['avoid_repeats'] = self.avoid_repeats
+        node_def['count'] = self.sample_count
+
+        return node_def
 
     def evaluate(self, dialog, response=None, last_transition=None, extras=None, logger=None): # pylint: disable=too-many-arguments, too-many-locals, too-many-branches, too-many-statements, unused-argument
         safety_plan = extras.get('plan_safe_safety_plan', None)
@@ -239,9 +260,9 @@ class SendReasonsForLivingNode(BaseNode):
     def parse(dialog_def):
         if dialog_def['type'] == 'plan-safe-send-reasons-for-living':
             try:
-                fetch_node = SendReasonsForLivingNode(dialog_def['id'], dialog_def['next_id'], dialog_def.get('message_template', None), dialog_def.get('seconds_between', 10), dialog_def.get('count', 0), dialog_def.get('mode', 'sequential'))
+                send_node = SendReasonsForLivingNode(dialog_def['id'], dialog_def['next_id'], dialog_def.get('message_template', None), dialog_def.get('seconds_between', 10), dialog_def.get('count', 0), dialog_def.get('mode', 'sequential'))
 
-                return fetch_node
+                return send_node
             except KeyError:
                 traceback.print_exc()
 
@@ -270,12 +291,22 @@ class SendReasonsForLivingNode(BaseNode):
             'id': self.node_id,
             'next_id': self.next_node_id,
             'message_template': self.message_template,
-            'time_between': self.seconds_between,
-            'sample_count': self.sample_count,
+            'seconds_between': self.seconds_between,
+            'count': self.sample_count,
             'mode': self.mode,
         }
 
         return json.dumps(definition, indent=2)
+
+    def node_definition(self):
+        node_def = super().node_definition() # pylint: disable=missing-super-argument
+
+        node_def['message_template'] = self.message_template
+        node_def['seconds_between'] = self.seconds_between
+        node_def['count'] = self.sample_count
+        node_def['mode'] = self.mode
+
+        return node_def
 
     def evaluate(self, dialog, response=None, last_transition=None, extras=None, logger=None): # pylint: disable=too-many-arguments, too-many-locals, too-many-branches, too-many-statements, unused-argument
         safety_plan = extras.get('plan_safe_safety_plan', None)
@@ -314,13 +345,21 @@ class SendReasonsForLivingNode(BaseNode):
             new_extras = dict(extras)
 
             new_extras['reason'] = {
-                'caption': mark_safe(reason.caption),
+                'caption': mark_safe(reason.caption), # nosec
                 'index': reason_index,
             }
 
-            template = django_engine.from_string(self.message_template)
+            logger.error('self.message_template: %s', self.message_template)
+            logger.error('extras: %s', new_extras)
+
+            template = django_engine.from_string('{{ reason.caption }}')
+
+            if self.message_template is not None and len(self.message_template.strip()) > 0:
+                template = django_engine.from_string(self.message_template)
 
             rendered_value = template.render(new_extras)
+
+            logger.error('rendered_value: %s', rendered_value)
 
             action = {
                 'type': 'echo',
@@ -563,8 +602,10 @@ def fetch_destination_variables(destination):
     return variables
 
 def initialize_dialog(dialog):
+    logger = logging.getLogger()
+
     if dialog.script is not None and 'embed-dialogs' in dialog.script.labels_list():
-        embeds = ('safety-plan-now', 'menu-060525')
+        embeds = ('safety-plan-now', 'menu-060525', 'automated-risk-management')
 
         original_nodes = dialog.dialog_snapshot
 
@@ -580,6 +621,8 @@ def initialize_dialog(dialog):
 
                 embed_nodes = machine.dialog_definition()
 
+                logger.error('initialize_dialog - nodes: %s', json.dumps(embed_nodes, indent=2))
+
                 for node in embed_nodes:
                     if (node['type'] in ('begin', 'end',)) is False:
                         original_nodes.append(node)
@@ -587,3 +630,48 @@ def initialize_dialog(dialog):
         dialog.dialog_snapshot = original_nodes
 
         dialog.save()
+
+def allow_session_nudge(session):
+    session_dest = session.current_destination()
+
+    for participant in Participant.objects.all():
+        if participant.fetch_phone_number() == session_dest:
+            now = participant.local_time(timezone.now())
+
+            start = participant.local_time(datetime.datetime(now.year, now.month, now.day, hour=participant.day_start.hour, minute=participant.day_start.minute))
+            end = participant.local_time(datetime.datetime(now.year, now.month, now.day, hour=participant.day_end.hour, minute=participant.day_end.minute))
+
+            if start > end:
+                end = end + datetime.timedelta(days=1)
+
+            if (end - start).total_seconds() < (60 * 60 * settings.PLAN_SAFE_MINIMUM_WINDOW_HOURS): # 10 hours:
+                end = start + datetime.timedelta(hours=10)
+
+            if start <= now <= end:
+                return True
+
+            return False
+
+    return True
+
+def launch_keyword_enabled(sender, keyword): # pylint: disable=unused-argument
+    definition = {}
+
+    try:
+        definition = json.loads(keyword.launch_condition)
+    except json.JSONDecodeError:
+        pass
+
+    condition = definition.get('condition', None)
+
+    if condition is not None:
+        if condition == 'plan_safe_active':
+            # Should be active all the time outside of dialogs.
+            # Always want this accessible once people have gotten the safety plan
+            # (i.e, control group as well but only once the plansafe part of the intervention is active).
+
+            pass
+        elif condition == 'in_blank_days':
+            pass
+
+    return True

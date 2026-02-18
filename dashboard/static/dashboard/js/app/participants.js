@@ -187,11 +187,15 @@ requirejs(['material', 'cookie', 'moment', 'jquery', 'base'], function (mdc, Coo
 
   const addParticipantPhone = mdc.textField.MDCTextField.attachTo(document.getElementById('new_participant_phone'))
   const addParticipantPersonalizedName = mdc.textField.MDCTextField.attachTo(document.getElementById('new_participant_personalized_name'))
+  const addParticipantStartTime = mdc.textField.MDCTextField.attachTo(document.getElementById('new_participant_start_time'))
+  const addParticipantEndTime = mdc.textField.MDCTextField.attachTo(document.getElementById('new_participant_end_time'))
 
   $('#fab_add_participant').click(function (eventObj) {
     addParticipantIdentifier.value = ''
     addParticipantPhone.value = ''
     addParticipantPersonalizedName.value = ''
+    addParticipantStartTime.value = '07:00'
+    addParticipantEndTime.value = '22:00'
 
     $('input[name="new_participant_timezone"]:checked').attr('checked', false)
     $('input[name="new_participant_study_arm"]:checked').attr('checked', false)
@@ -209,6 +213,8 @@ requirejs(['material', 'cookie', 'moment', 'jquery', 'base'], function (mdc, Coo
         identifier: addParticipantIdentifier.value,
         phone_number: addParticipantPhone.value,
         personalized_name: addParticipantPersonalizedName.value,
+        start_time: addParticipantStartTime.value,
+        end_time: addParticipantEndTime.value,
         study_arm: $('input[name="new_participant_study_arm"]:checked').val(),
         time_zone: $('input[name="new_participant_time_zone"]:checked').val()
       }
@@ -234,11 +240,16 @@ requirejs(['material', 'cookie', 'moment', 'jquery', 'base'], function (mdc, Coo
   const updateParticipantIdentifier = mdc.textField.MDCTextField.attachTo(document.getElementById('update_participant_id'))
   const updateParticipantPhone = mdc.textField.MDCTextField.attachTo(document.getElementById('update_participant_phone'))
   const updateParticipantPersonalizedName = mdc.textField.MDCTextField.attachTo(document.getElementById('update_participant_personalized_name'))
+  const updateParticipantStartTime = mdc.textField.MDCTextField.attachTo(document.getElementById('update_participant_start_time'))
+  const updateParticipantEndTime = mdc.textField.MDCTextField.attachTo(document.getElementById('update_participant_end_time'))
 
   $('.update_user').click(function (eventObj) {
     updateParticipantIdentifier.value = $(this).attr('data-user-id')
     updateParticipantPhone.value = $(this).attr('data-phone')
     updateParticipantPersonalizedName.value = $(this).attr('data-personalized-name')
+
+    updateParticipantStartTime.value = $(this).attr('data-start-time')
+    updateParticipantEndTime.value = $(this).attr('data-end-time')
 
     $('input[name="update_participant_timezone"]:checked').attr('checked', false)
     $('input[name="update_participant_study_arm"]:checked').attr('checked', false)
@@ -259,6 +270,8 @@ requirejs(['material', 'cookie', 'moment', 'jquery', 'base'], function (mdc, Coo
         identifier: updateParticipantIdentifier.value,
         phone_number: updateParticipantPhone.value,
         personalized_name: updateParticipantPersonalizedName.value,
+        start_time: updateParticipantStartTime.value,
+        end_time: updateParticipantEndTime.value,
         time_zone: $('input[name="update_participant_timezone"]:checked').val(),
         study_arm: $('input[name="update_participant_study_arm"]:checked').val()
       }

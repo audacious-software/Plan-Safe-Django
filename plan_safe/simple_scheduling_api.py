@@ -2,15 +2,18 @@
 
 import logging
 import random
+import traceback
 
 from django.conf import settings
 from django.utils import timezone
 
 from django_dialog_engine.models import DialogScript
 
-from .models import Participant
+from .models import Participant, StudyArm
 
-def schedule_day_message(participant, events, day_index): # pylint: disable=too-many-locals, too-many-branches
+logger = logging.getLogger(__name__) # pylint: disable=invalid-name
+
+def schedule_day_message(participant, events, day_index): # pylint: disable=too-many-locals, too-many-branches, too-many-statements
     now = timezone.now()
 
     today = participant.translate_to_localtime(now).date()
@@ -38,31 +41,33 @@ def schedule_day_message(participant, events, day_index): # pylint: disable=too-
             if today == seen_dialog['when'].date():
                 return # Dialog already scheduled, go to next participant...
 
-            if len(eligible_labels) == 0:
-                return # All dialogs have been sent
+        if len(eligible_labels) == 0:
+            return # All dialogs have been sent
 
-            next_dialog_label = eligible_labels[0]
+        next_dialog_label = eligible_labels[0]
 
-            next_script = DialogScript.objects.fetch_by_label(next_dialog_label).first()
+        next_script = DialogScript.objects.fetch_by_label(next_dialog_label).first()
 
-            if next_script is not None:
-                when = participant.fetch_today_start()
+        if next_script is not None:
+            when = participant.fetch_today_start()
 
-                events.append({
-                    'event_key': event_key,
-                    'action': 'simple_messaging.send_message',
-                    'when': when.isoformat(),
-                    'context': {
-                        'destination': participant.fetch_phone_number(),
-                        'message': 'dialog:%s' % next_script.identifier,
-                    }
-                })
+            events.append({
+                'event_key': event_key,
+                'action': 'simple_messaging.send_message',
+                'when': when.isoformat(),
+                'context': {
+                    'destination': participant.fetch_phone_number(),
+                    'message': 'dialog:%s' % next_script.identifier,
+                }
+            })
 
-                return
+            return
 
-            logging.error('plan_safe.simple_scheduling_api: Dialog %s is not available for scheduling.', next_dialog_label)
+        logger.warning('plan_safe.simple_scheduling_api: Dialog %s is not available for scheduling.', next_dialog_label)
     elif participant.is_paused():
         return
+    # elif participant.has_open_dialog():
+    #     return
     elif day_index < 28:
         # If paused today, skip - add pause days to retain followup-other-followup-other pattern
 
@@ -116,9 +121,14 @@ def schedule_day_message(participant, events, day_index): # pylint: disable=too-
 
             last_sent = None
 
+            seen_on_demand = False
+
             for seen_dialog in seen_dialogs:
                 if seen_dialog['identifier'] in other_dialogs:
                     other_dialogs.remove(seen_dialog['identifier'])
+
+                if seen_dialog['identifier'] == 'on-demand-dialogs-060625':
+                    seen_on_demand = True
 
                 if last_sent is None or last_sent < seen_dialog['when'].date():
                     last_sent = seen_dialog['when'].date()
@@ -140,6 +150,19 @@ def schedule_day_message(participant, events, day_index): # pylint: disable=too-
                         'message': 'dialog:%s' % other_dialogs[0],
                     }
                 })
+            elif seen_on_demand is False:
+                when = participant.fetch_today_start()
+
+                events.append({
+                    'event_key': event_key,
+                    'action': 'simple_messaging.send_message',
+                    'when': when,
+                    'context': {
+                        'destination': participant.fetch_phone_number(),
+                        'message': 'dialog:on-demand-dialogs-060625'
+                    }
+                })
+
     elif day_index == 28:
         when = participant.fetch_today_start()
         events.append({
@@ -157,7 +180,9 @@ def fetch_scheduled_events_control(): # pylint: disable=invalid-name
 
     now = timezone.now()
 
-    for participant in Participant.objects.filter(metadata__is_control=True, active=True):
+    control_arm = StudyArm.objects.get(identifier='control')
+
+    for participant in Participant.objects.filter(active=True, study_arm=control_arm):
         start_date = participant.translate_to_localtime(participant.created).date()
 
         today = participant.translate_to_localtime(now).date()
@@ -166,7 +191,19 @@ def fetch_scheduled_events_control(): # pylint: disable=invalid-name
 
         event_key = '%s_day_%s' % (participant.identifier, day_index)
 
-        if day_index == 0 - settings.PLAN_SAFE_CONTROL_DELAY_DAYS:
+        logger.info('[con] %s: %s', participant.identifier, event_key)
+
+        if day_index == 0 - settings.PLAN_SAFE_CONTROL_DELAY_DAYS: # On enrollment
+            events.append({
+                'event_key': event_key,
+                'action': 'simple_messaging.send_message',
+                'when': now.isoformat(),
+                'context': {
+                    'destination': participant.fetch_phone_number(),
+                    'message': 'dialog:%s' % 'control-enrollment',
+                }
+            })
+        elif day_index == 0: # After delay
             events.append({
                 'event_key': event_key,
                 'action': 'simple_messaging.send_message',
@@ -186,7 +223,9 @@ def fetch_scheduled_events_experiment(): # pylint: disable=invalid-name
 
     now = timezone.now()
 
-    for participant in Participant.objects.filter(metadata__is_control=False, active=True):
+    experiment_arm = StudyArm.objects.get(identifier='experiment')
+
+    for participant in Participant.objects.filter(active=True, study_arm=experiment_arm):
         start_date = participant.translate_to_localtime(participant.created).date()
 
         today = participant.translate_to_localtime(now).date()
@@ -194,6 +233,8 @@ def fetch_scheduled_events_experiment(): # pylint: disable=invalid-name
         day_index = (today - start_date).days - participant.days_paused()
 
         event_key = '%s_day_%s' % (participant.identifier, day_index)
+
+        logger.info('[exp] %s: %s', participant.identifier, event_key)
 
         if day_index == 0:
             events.append({
@@ -213,7 +254,10 @@ def fetch_scheduled_events_experiment(): # pylint: disable=invalid-name
 def fetch_scheduled_events():
     events = []
 
-    events.extend(fetch_scheduled_events_control())
-    events.extend(fetch_scheduled_events_experiment())
+    try:
+        events.extend(fetch_scheduled_events_control())
+        events.extend(fetch_scheduled_events_experiment())
+    except: # pylint: disable=bare-except
+        logger.warning(traceback.format_exc())
 
     return events
