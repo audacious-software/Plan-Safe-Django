@@ -1,3 +1,5 @@
+import tempfile
+
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -32,6 +34,13 @@ SIMPLE_MESSAGING_SECRET_KEY = 'CHANGEME' # nosec
 
 SIMPLE_MESSAGING_COUNTRY_CODE = 'US'
 
-SILENCED_SYSTEM_CHECKS = ['security.W004']
+SILENCED_SYSTEM_CHECKS = [
+    'security.W004',
+    'simple_messaging.W002',
+    'simple_messaging_switchboard.E001',
+    'simple_messaging_switchboard.E002',
+]
 
 SIMPLE_DASHBOARD_SITE_NAME = 'CI Testing Site'
+
+QUICKSILVER_LOCK_DIR = tempfile.gettempdir()
