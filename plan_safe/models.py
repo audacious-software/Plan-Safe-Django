@@ -804,7 +804,7 @@ class SafetyPlan(models.Model): # pylint: disable=too-many-public-methods, too-m
             else:
                 unseen = reasons
         elif sequential is False:
-            unseen = random.sample(reasons, k=sample_count)
+            unseen = random.sample(reasons, k=sample_count) # nosec
 
         if sequential is False:
             random.shuffle(unseen)
