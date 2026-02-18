@@ -32,7 +32,8 @@ jobs:
           name: Validate Javascript code
           command: |
             npm install
-            npx eslint dashboard/static/dashboard/js/app
+            npx standard dashboard/static/dashboard/js/app
+            npx standard plan_safe/static/plan_safe/js/app/
       - run:
           name: Build and validate
           command: |
@@ -103,7 +104,8 @@ jobs:
           name: Validate Javascript code
           command: |
             npm install
-            npx eslint dashboard/static/dashboard/js/app
+            npx standard dashboard/static/dashboard/js/app
+            npx standard plan_safe/static/plan_safe/js/app/
       - run:
           name: Build and validate
           command: |
@@ -174,7 +176,8 @@ jobs:
           name: Validate Javascript code
           command: |
             npm install
-            npx eslint dashboard/static/dashboard/js/app
+            npx standard dashboard/static/dashboard/js/app
+            npx standard plan_safe/static/plan_safe/js/app/
       - run:
           name: Build and validate
           command: |

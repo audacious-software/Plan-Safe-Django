@@ -1,4 +1,4 @@
-/* global requirejs, alert */
+/* global requirejs, alert, $ */
 
 requirejs.config({
   shim: {
@@ -113,7 +113,7 @@ requirejs(['material', 'cookie', 'moment', 'jquery', 'base'], function (mdc, Coo
       const identifier = $('#schedule_identifier').val()
 
       const payload = {
-        identifier: identifier,
+        identifier,
         date: dateField.value,
         interrupt_minutes: interruptMinutesField.value,
         pause_minutes: internalMinutesField.value,

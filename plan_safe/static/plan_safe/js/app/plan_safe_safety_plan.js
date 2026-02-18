@@ -1,4 +1,4 @@
-/* global requirejs */
+/* global requirejs, $ */
 
 requirejs.config({
   shim: {
@@ -37,7 +37,7 @@ requirejs(['cookie', 'bootstrap', 'jquery'], function (Cookies, bootstrap) {
     }
   })
 
-  const updateConfirmationDialog = function(title, message, action, onAction) {
+  const updateConfirmationDialog = function (title, message, action, onAction) {
     $('#confirmation_dialog h5.modal-title').html(title)
     $('#confirmation_dialog .modal-body').html(message)
     $('#confirmation_dialog button.btn-primary').html(action)
@@ -51,10 +51,10 @@ requirejs(['cookie', 'bootstrap', 'jquery'], function (Cookies, bootstrap) {
     }
   }
 
-  const wireUpDelete = function() {
+  const wireUpDelete = function () {
     $('.action-delete').off('click')
 
-    $('.action-delete').click(function(eventObj) {
+    $('.action-delete').click(function (eventObj) {
       eventObj.preventDefault()
 
       const listItem = $(this).parent()
@@ -63,70 +63,70 @@ requirejs(['cookie', 'bootstrap', 'jquery'], function (Cookies, bootstrap) {
       const elementValue = $(this).attr('data-value')
 
       const params = {
-        'action': 'remove',
-        'section': elementType,
-        'value': elementValue
+        action: 'remove',
+        section: elementType,
+        value: elementValue
       }
 
       if (elementType === 'warning_sign') {
-        updateConfirmationDialog('Remove warning sign?', `Would you like to remove "${elementValue}" from your safety plan?`, 'Remove', function() {
-          $.post(window.location.href, params, function(response, status, jqXHR) {
+        updateConfirmationDialog('Remove warning sign?', `Would you like to remove "${elementValue}" from your safety plan?`, 'Remove', function () {
+          $.post(window.location.href, params, function (response, status, jqXHR) {
             listItem.remove()
 
             $('#confirmation_dialog').modal('hide')
           })
         })
       } else if (elementType === 'coping_skill') {
-        updateConfirmationDialog('Remove coping skill?', `Would you like to remove "${elementValue}" from your safety plan?`, 'Remove', function() {
-          $.post(window.location.href, params, function(response, status, jqXHR) {
+        updateConfirmationDialog('Remove coping skill?', `Would you like to remove "${elementValue}" from your safety plan?`, 'Remove', function () {
+          $.post(window.location.href, params, function (response, status, jqXHR) {
             listItem.remove()
 
             $('#confirmation_dialog').modal('hide')
           })
         })
       } else if (elementType === 'environmental_safety') {
-        updateConfirmationDialog('Remove emvironmental safety?', `Would you like to remove "${elementValue}" from your safety plan?`, 'Remove', function() {
-          $.post(window.location.href, params, function(response, status, jqXHR) {
+        updateConfirmationDialog('Remove emvironmental safety?', `Would you like to remove "${elementValue}" from your safety plan?`, 'Remove', function () {
+          $.post(window.location.href, params, function (response, status, jqXHR) {
             listItem.remove()
 
             $('#confirmation_dialog').modal('hide')
           })
         })
       } else if (elementType === 'person_distraction') {
-        updateConfirmationDialog('Remove person for distraction?', `Would you like to remove "${elementValue}" from your safety plan?`, 'Remove', function() {
-          $.post(window.location.href, params, function(response, status, jqXHR) {
+        updateConfirmationDialog('Remove person for distraction?', `Would you like to remove "${elementValue}" from your safety plan?`, 'Remove', function () {
+          $.post(window.location.href, params, function (response, status, jqXHR) {
             listItem.remove()
 
             $('#confirmation_dialog').modal('hide')
           })
         })
       } else if (elementType === 'person_help') {
-        updateConfirmationDialog('Remove person for help?', `Would you like to remove "${elementValue}" from your safety plan?`, 'Remove', function() {
-          $.post(window.location.href, params, function(response, status, jqXHR) {
+        updateConfirmationDialog('Remove person for help?', `Would you like to remove "${elementValue}" from your safety plan?`, 'Remove', function () {
+          $.post(window.location.href, params, function (response, status, jqXHR) {
             listItem.remove()
 
             $('#confirmation_dialog').modal('hide')
           })
         })
       } else if (elementType === 'person_medical') {
-        updateConfirmationDialog('Remove medical provider?', `Would you like to remove "${elementValue}" from your safety plan?`, 'Remove', function() {
-          $.post(window.location.href, params, function(response, status, jqXHR) {
+        updateConfirmationDialog('Remove medical provider?', `Would you like to remove "${elementValue}" from your safety plan?`, 'Remove', function () {
+          $.post(window.location.href, params, function (response, status, jqXHR) {
             listItem.remove()
 
             $('#confirmation_dialog').modal('hide')
           })
         })
       } else if (elementType === 'person_mental') {
-        updateConfirmationDialog('Remove mental health provider?', `Would you like to remove "${elementValue}" from your safety plan?`, 'Remove', function() {
-          $.post(window.location.href, params, function(response, status, jqXHR) {
+        updateConfirmationDialog('Remove mental health provider?', `Would you like to remove "${elementValue}" from your safety plan?`, 'Remove', function () {
+          $.post(window.location.href, params, function (response, status, jqXHR) {
             listItem.remove()
 
             $('#confirmation_dialog').modal('hide')
           })
         })
       } else if (elementType === 'person_mental') {
-        updateConfirmationDialog('Remove mental health provider?', `Would you like to remove "${elementValue}" from your safety plan?`, 'Remove', function() {
-          $.post(window.location.href, params, function(response, status, jqXHR) {
+        updateConfirmationDialog('Remove mental health provider?', `Would you like to remove "${elementValue}" from your safety plan?`, 'Remove', function () {
+          $.post(window.location.href, params, function (response, status, jqXHR) {
             listItem.remove()
 
             $('#confirmation_dialog').modal('hide')
@@ -139,7 +139,7 @@ requirejs(['cookie', 'bootstrap', 'jquery'], function (Cookies, bootstrap) {
 
     $('.action-delete-reason').off('click')
 
-    $('.action-delete-reason').click(function(eventObj) {
+    $('.action-delete-reason').click(function (eventObj) {
       eventObj.preventDefault()
 
       const listItem = $(this).parent()
@@ -148,13 +148,13 @@ requirejs(['cookie', 'bootstrap', 'jquery'], function (Cookies, bootstrap) {
       const elementValue = $(this).attr('data-value')
 
       const params = {
-        'action': 'remove-reason',
-        'section': 'reasons_for_living',
-        'value': elementId
+        action: 'remove-reason',
+        section: 'reasons_for_living',
+        value: elementId
       }
 
-      updateConfirmationDialog('Remove reason for living?', `Would you like to remove "${elementValue}" from your safety plan?`, 'Remove', function() {
-        $.post(window.location.href, params, function(response, status, jqXHR) {
+      updateConfirmationDialog('Remove reason for living?', `Would you like to remove "${elementValue}" from your safety plan?`, 'Remove', function () {
+        $.post(window.location.href, params, function (response, status, jqXHR) {
           listItem.remove()
 
           $('#confirmation_dialog').modal('hide')
@@ -166,7 +166,7 @@ requirejs(['cookie', 'bootstrap', 'jquery'], function (Cookies, bootstrap) {
 
     $('.reason-preview-image').off('click')
 
-    $('.reason-preview-image').click(function(eventObj) {
+    $('.reason-preview-image').click(function (eventObj) {
       eventObj.preventDefault()
 
       $('#preview_image').attr('src', $(this).attr('data-image'))
@@ -175,7 +175,7 @@ requirejs(['cookie', 'bootstrap', 'jquery'], function (Cookies, bootstrap) {
     })
   }
 
-  $('.action-add').click(function(eventObj) {
+  $('.action-add').click(function (eventObj) {
     eventObj.preventDefault()
 
     const input = $(this).parent().find('input')
@@ -183,17 +183,15 @@ requirejs(['cookie', 'bootstrap', 'jquery'], function (Cookies, bootstrap) {
     const elementType = $(this).attr('data-type')
     const toAdd = input.val()
 
-    const newElement = `<li class="list-group-item">${toAdd}<a href="#" class="action-delete" data-type="${elementType}" data-value="${toAdd}"><i class="bi bi-trash float-end"></i></a></li>`
-
     const addItem = $(this).parent().parent()
 
     const params = {
-      'action': 'add',
-      'section': elementType,
-      'value': toAdd
+      action: 'add',
+      section: elementType,
+      value: toAdd
     }
 
-    $.post(window.location.href, params, function(response, status, jqXHR) {
+    $.post(window.location.href, params, function (response, status, jqXHR) {
       let newElement = `<li class="list-group-item">${toAdd}<a href="#" class="action-delete" data-type="${elementType}" data-value="${toAdd}"><i class="bi bi-trash float-end"></i></a></li>`
 
       if (elementType.startsWith('person_')) {
@@ -210,31 +208,31 @@ requirejs(['cookie', 'bootstrap', 'jquery'], function (Cookies, bootstrap) {
     })
   })
 
-  $('.crisis_line_check').on('change', function(eventObj) {
-    const checked = $(eventObj.target).prop('checked');
+  $('.crisis_line_check').on('change', function (eventObj) {
+    const checked = $(eventObj.target).prop('checked')
     const id = $(eventObj.target).attr('data-id')
 
     const params = {
-      'action': 'select-crisis-line',
-      'section': 'crisis_text_lines',
-      'line': `${id}`,
-      'checked': `${checked}`
+      action: 'select-crisis-line',
+      section: 'crisis_text_lines',
+      line: `${id}`,
+      checked: `${checked}`
     }
 
-    $.post(window.location.href, params, function(response, status, jqXHR) {
+    $.post(window.location.href, params, function (response, status, jqXHR) {
 
     })
   })
 
   const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
-  const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+  const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl)) // eslint-disable-line no-unused-vars
 
-  $('.message-tooltip').click(function(eventObj) {
+  $('.message-tooltip').click(function (eventObj) {
     eventObj.preventDefault()
 
     let message = $(eventObj.target).attr('data-bs-title')
 
-    if (message == '(No message available.)') {
+    if (message === '(No message available.)') {
       message = ''
     }
 
@@ -249,23 +247,23 @@ requirejs(['cookie', 'bootstrap', 'jquery'], function (Cookies, bootstrap) {
     const who = $(this).attr('data-value')
     const type = $(this).attr('data-type')
 
-    saveButton.click(function(eventObj) {
+    saveButton.click(function (eventObj) {
       const newMessage = $('#helper_message').val()
 
       const params = {
-        'action': 'update-message',
-        'value': newMessage
+        action: 'update-message',
+        value: newMessage
       }
 
       if (type !== undefined) {
-      	params['section'] = type
+        params.section = type
       }
 
       if (who !== undefined) {
-      	params['person'] = who
+        params.person = who
       }
 
-      $.post(window.location.href, params, function(response, status, jqXHR) {
+      $.post(window.location.href, params, function (response, status, jqXHR) {
         if (newMessage.trim() !== '') {
           tooltip.addClass('bi-chat-left-text-fill')
           tooltip.removeClass('bi-chat-left')
@@ -274,11 +272,11 @@ requirejs(['cookie', 'bootstrap', 'jquery'], function (Cookies, bootstrap) {
           tooltip.addClass('bi-chat-left')
         }
 
-	    tooltip.attr('data-bs-title', newMessage)
+        tooltip.attr('data-bs-title', newMessage)
 
-        var toUpdate = bootstrap.Tooltip.getInstance(tooltip.get(0));
+        const toUpdate = bootstrap.Tooltip.getInstance(tooltip.get(0))
 
-	    toUpdate.setContent({ '.tooltip-inner': newMessage });
+        toUpdate.setContent({ '.tooltip-inner': newMessage })
 
         $('#helper_message').val('')
 
@@ -289,7 +287,7 @@ requirejs(['cookie', 'bootstrap', 'jquery'], function (Cookies, bootstrap) {
     $('#message_dialog').modal('show')
   })
 
-  $('.input-group input.form-control').keypress(function(eventObj) {
+  $('.input-group input.form-control').keypress(function (eventObj) {
     if (eventObj.which === 13) { // 13 is the key code for 'Enter'
       eventObj.preventDefault()
 
@@ -301,20 +299,20 @@ requirejs(['cookie', 'bootstrap', 'jquery'], function (Cookies, bootstrap) {
     $(this).parent().find('#button-reason').tooltip('show')
   })
 
-  $('#button-reason').click(function(eventObj) {
+  $('#button-reason').click(function (eventObj) {
     eventObj.preventDefault()
 
     const reasonField = $(this).parent().find('input.form-control')
 
     const reason = reasonField.val()
 
-    var formData = new FormData();
+    const formData = new FormData()
     formData.append('action', 'add-reason')
     formData.append('section', 'reasons_for_living')
     formData.append('value', reason.trim())
 
     if ($('#reason_file').get(0).files.length > 0) {
-      formData.append('reason_file', $('#reason_file')[0].files[0]);
+      formData.append('reason_file', $('#reason_file')[0].files[0])
     }
 
     const addItem = $(this).parent().parent()
@@ -325,7 +323,7 @@ requirejs(['cookie', 'bootstrap', 'jquery'], function (Cookies, bootstrap) {
       data: formData,
       processData: false,
       contentType: false,
-      success: function(response) {
+      success: function (response) {
         let newElement = '<li class="list-group-item">'
 
         if (response.image !== undefined) {
@@ -347,22 +345,22 @@ requirejs(['cookie', 'bootstrap', 'jquery'], function (Cookies, bootstrap) {
     })
   })
 
-  $('#button-reason-image').click(function(eventObj) {
+  $('#button-reason-image').click(function (eventObj) {
     eventObj.preventDefault()
 
     $('#reason_file').click()
   })
 
-  $('#button_confirm_image').click(function(eventObj) {
+  $('#button_confirm_image').click(function (eventObj) {
     $('#upload_preview_dialog').modal('hide')
 
-    window.setTimeout(function() {
-	    // $('#reason_field').tooltip('show')
-    	$('#reason_field').focus()
+    window.setTimeout(function () {
+      // $('#reason_field').tooltip('show')
+      $('#reason_field').focus()
     }, 250)
   })
 
-  $('#button_abandon_image').click(function(eventObj) {
+  $('#button_abandon_image').click(function (eventObj) {
     $('#reason_file').val('')
 
     $('#button-reason-image').removeClass('btn-success')
@@ -371,16 +369,16 @@ requirejs(['cookie', 'bootstrap', 'jquery'], function (Cookies, bootstrap) {
     $('#upload_preview_dialog').modal('hide')
   })
 
-  $('#reason_file').on('change', function() {
+  $('#reason_file').on('change', function () {
     $('#button-reason-image').removeClass('btn-secondary')
     $('#button-reason-image').addClass('btn-success')
 
-  	const [file] = $('#reason_file')[0].files
+    const [file] = $('#reason_file')[0].files
 
     if (file) {
       $('#uploaded_image').attr('src', URL.createObjectURL(file))
       $('#upload_preview_dialog').modal('show')
-	}
+    }
   })
 
   $('[data-bs-toggle="tooltip"]').tooltip()
