@@ -605,7 +605,10 @@ def initialize_dialog(dialog):
     logger = logging.getLogger()
 
     if dialog.script is not None and 'embed-dialogs' in dialog.script.labels_list():
-        embeds = ('safety-plan-now', 'menu-060525', 'automated-risk-management')
+        embeds = ['safety-plan-now', 'menu-060525']
+
+        if ('exclude-arm' in dialog.script.labels_list()) is False:
+            embeds.append('automated-risk-management')
 
         original_nodes = dialog.dialog_snapshot
 
@@ -649,6 +652,9 @@ def allow_session_nudge(session):
 
             if start <= now <= end:
                 return True
+
+            # TODO: Get dialog from session - get latest transition from dialog
+            #        - if transition is pause/send message < 60 seconds (make configurable), allow nudge
 
             return False
 

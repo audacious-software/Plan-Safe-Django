@@ -1,4 +1,4 @@
-# pylint: disable=no-member, line-too-long
+# pylint: disable=no-member, line-too-long, too-many-lines
 
 import datetime
 import random
@@ -25,6 +25,7 @@ from django.utils.crypto import get_random_string
 
 from django_dialog_engine.models import DialogScript
 from simple_messaging.models import encrypt_value, decrypt_value, OutgoingMessage
+from simple_messaging_dialog_support.models import DialogSession
 
 SUPPORTER_ROLES = (
     ('distraction', 'Distraction',),
@@ -88,6 +89,12 @@ class Participant(models.Model):
 
     login_token = models.CharField(max_length=1024, null=True, blank=True)
 
+    def current_phone_number(self):
+        if self.phone_number is not None and self.phone_number.startswith('secret:'):
+            return decrypt_value(self.phone_number)
+
+        return self.phone_number
+
     def fetch_today_start(self):
         now = self.translate_to_localtime(timezone.now())
 
@@ -125,7 +132,7 @@ class Participant(models.Model):
 
         return str(self.fetch_phone_number(obfuscated=True))
 
-    def translate_to_localtime(self, original): # pylint: disable=no-self-use
+    def translate_to_localtime(self, original):
         here_tz = pytz.timezone(self.time_zone.name)
 
         return original.astimezone(here_tz)
@@ -139,6 +146,54 @@ class Participant(models.Model):
             self.save()
 
         return '%s%s' % (settings.SITE_URL, reverse('plan_safe_safety_plan', args=[self.login_token]))
+
+    def days_overlapped(self):
+        overlap_dates = self.metadata.get('overlap_dates', [])
+
+        today = self.fetch_today_start().date()
+
+        overlap_count = 0
+
+        for date_str in overlap_dates:
+            when_date = datetime.date.strptime(date_str, '%Y-%m-%d')
+
+            if when_date <= today:
+                overlap_count += 1
+
+        return overlap_count
+
+    def is_overlapped(self):
+        overlap_dates = self.metadata.get('overlap_dates', [])
+
+        now = timezone.now()
+
+        today = self.translate_to_localtime(now).date().isoformat()
+
+        return (today in overlap_dates) # pylint: disable=superfluous-parens
+
+    def has_open_dialog(self):
+        if self.is_overlapped():
+            return True
+
+        now = self.translate_to_localtime(timezone.now())
+
+        for session in DialogSession.objects.filter(finished=None):
+            if session.current_destination() == self.current_phone_number():
+                if now.time() > self.day_start:
+                    overlap_dates = self.metadata.get('overlap_dates', [])
+
+                    when_key = now.date().isoformat()
+
+                    if (when_key in overlap_dates) is False:
+                        overlap_dates.append(when_key)
+
+                        self.metadata['overlap_dates'] = overlap_dates # pylint: disable=unsupported-assignment-operation
+
+                        self.save()
+
+                return True
+
+        return False
 
     def days_paused(self):
         pause_dates = self.metadata.get('pause_dates', [])
