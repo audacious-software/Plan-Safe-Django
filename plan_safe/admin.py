@@ -1,8 +1,9 @@
-# pylint: disable=line-too-long
+# pylint: disable=line-too-long, super-with-arguments
 
 from prettyjson import PrettyJSONWidget
 
 from django.contrib import admin
+from django.utils.safestring import mark_safe
 
 try:
     from django.db.models import JSONField
@@ -11,13 +12,17 @@ except ImportError:
 
 from .models import Participant, TimeZone, StudyArm, SafetyPlan, ReasonForLiving, CrisisHelpLine
 
+class PrettyJSONWidgetFixed(PrettyJSONWidget):
+    def render(self, name, value, attrs=None, **kwargs):
+        return mark_safe(super(PrettyJSONWidgetFixed, self).render(name, value, attrs=None, **kwargs)) # nosec
+
 @admin.register(Participant)
 class ParticipantAdmin(admin.ModelAdmin):
     list_display = ('identifier', 'fetch_phone_number', 'login_token', 'personalized_name', 'time_zone', 'created', 'updated',)
     list_filter = ('active', 'time_zone', 'created', 'updated',)
 
     formfield_overrides = {
-        JSONField: {'widget': PrettyJSONWidget(attrs={'initial': 'parsed'})}
+        JSONField: {'widget': PrettyJSONWidgetFixed(attrs={'initial': 'parsed'})}
     }
 
     def mark_inactive(self, request, queryset): # pylint: disable=unused-argument, no-self-use

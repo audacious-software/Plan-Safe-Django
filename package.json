@@ -8,9 +8,6 @@
   },
   "author": "Chris J. Karr",
   "license": "Apache-2.0",
-  "dependencies": {
-    "eslint": "^10.0.0"
-  },
   "devDependencies": {
     "standard": "^17.1.2"
   }

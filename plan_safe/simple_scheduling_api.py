@@ -13,7 +13,7 @@ from .models import Participant, StudyArm
 
 logger = logging.getLogger(__name__) # pylint: disable=invalid-name
 
-def schedule_day_message(participant, events, day_index): # pylint: disable=too-many-locals, too-many-branches, too-many-statements
+def schedule_day_message(participant, events, day_index): # pylint: disable=too-many-return-statements, too-many-locals, too-many-branches, too-many-statements
     now = timezone.now()
 
     today = participant.translate_to_localtime(now).date()
@@ -66,8 +66,8 @@ def schedule_day_message(participant, events, day_index): # pylint: disable=too-
         logger.warning('plan_safe.simple_scheduling_api: Dialog %s is not available for scheduling.', next_dialog_label)
     elif participant.is_paused():
         return
-    # elif participant.has_open_dialog():
-    #     return
+    elif participant.is_overlapped() or participant.has_open_dialog():
+        return
     elif day_index < 28:
         # If paused today, skip - add pause days to retain followup-other-followup-other pattern
 
@@ -187,7 +187,7 @@ def fetch_scheduled_events_control(): # pylint: disable=invalid-name
 
         today = participant.translate_to_localtime(now).date()
 
-        day_index = (today - start_date).days - settings.PLAN_SAFE_CONTROL_DELAY_DAYS - participant.days_paused()
+        day_index = (today - start_date).days - settings.PLAN_SAFE_CONTROL_DELAY_DAYS - participant.days_paused() - participant.days_overlapped()
 
         event_key = '%s_day_%s' % (participant.identifier, day_index)
 
@@ -230,7 +230,7 @@ def fetch_scheduled_events_experiment(): # pylint: disable=invalid-name
 
         today = participant.translate_to_localtime(now).date()
 
-        day_index = (today - start_date).days - participant.days_paused()
+        day_index = (today - start_date).days - participant.days_paused() - participant.days_overlapped()
 
         event_key = '%s_day_%s' % (participant.identifier, day_index)
 
