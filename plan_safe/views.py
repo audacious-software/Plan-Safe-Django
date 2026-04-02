@@ -1,5 +1,6 @@
 # pylint: disable=line-too-long, no-member
 
+import datetime
 import json
 import time
 
@@ -12,7 +13,7 @@ from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils import timezone
 
-from .models import Participant, CrisisHelpLine, ReasonForLiving
+from .models import Participant, CrisisHelpLine, ReasonForLiving, TimeZone
 
 def plan_safe_safety_plan(request, token): # pylint: disable=unused-argument, too-many-branches, too-many-locals, too-many-return-statements, too-many-statements
     if token.endswith('.'):
@@ -53,7 +54,14 @@ def plan_safe_safety_plan(request, token): # pylint: disable=unused-argument, to
         needs_login = True
 
     if request.method == 'POST' and request.POST.get('auth_phone_number', None) is not None:
-        parsed_number = phonenumbers.parse(request.POST.get('auth_phone_number', None), token_user.time_zone.country_code)
+        country_code = settings.SIMPLE_MESSAGING_COUNTRY_CODE
+
+        try:
+            country_code = token_user.time_zone.country_code
+        except AttributeError:
+            pass
+
+        parsed_number = phonenumbers.parse(request.POST.get('auth_phone_number', None), country_code)
 
         formatted_number = phonenumbers.format_number(parsed_number, phonenumbers.PhoneNumberFormat.E164)
 
@@ -344,6 +352,62 @@ def plan_safe_safety_plan(request, token): # pylint: disable=unused-argument, to
                     }
 
                     return HttpResponse(json.dumps(response_json, indent=2), content_type='application/json', status=201)
+                elif action == 'update_record':
+                    if section == 'name':
+                        token_user.personalized_name = value
+                        token_user.save()
+
+                        response_json = {
+                            'message': 'Success. Name updated.'
+                        }
+
+                        return HttpResponse(json.dumps(response_json, indent=2), content_type='application/json', status=200)
+                    elif section == 'time_zone':
+                        token_user.time_zone = TimeZone.objects.filter(name=value).first()
+                        token_user.save()
+
+                        response_json = {
+                            'message': 'Success. Time zone updated.'
+                        }
+
+                        return HttpResponse(json.dumps(response_json, indent=2), content_type='application/json', status=200)
+                    elif section == 'day_start':
+                        token_user.day_start = datetime.datetime.strptime(value, '%H:%M').time()
+                        token_user.save()
+
+                        response_json = {
+                            'message': 'Success. Day start updated.'
+                        }
+
+                        return HttpResponse(json.dumps(response_json, indent=2), content_type='application/json', status=200)
+                    elif section == 'day_end':
+                        token_user.day_end = datetime.datetime.strptime(value, '%H:%M').time()
+                        token_user.save()
+
+                        response_json = {
+                            'message': 'Success. Day end updated.'
+                        }
+
+                        return HttpResponse(json.dumps(response_json, indent=2), content_type='application/json', status=200)
+                    elif section == 'pause':
+                        days = int(value)
+
+                        token_user.add_pause_dates(days)
+
+                        response_json = {
+                            'message': 'Success. Pause extended.'
+                        }
+
+                        return HttpResponse(json.dumps(response_json, indent=2), content_type='application/json', status=200)
+                    elif section == 'resume':
+                        token_user.cancel_pause(days)
+
+                        response_json = {
+                            'message': 'Success. Pause cancelled.'
+                        }
+
+                        return HttpResponse(json.dumps(response_json, indent=2), content_type='application/json', status=200)
+
         else:
             response_json = {
                 'error': 'Invalid request. action = %s; section = %s' % (action, section)

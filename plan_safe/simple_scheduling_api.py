@@ -1,10 +1,12 @@
 # pylint: disable=line-too-long, no-member
 
+import json
 import logging
 import random
 import traceback
 
 from django.conf import settings
+from django.core.serializers.json import DjangoJSONEncoder
 from django.utils import timezone
 
 from django_dialog_engine.models import DialogScript
@@ -69,12 +71,6 @@ def schedule_day_message(participant, events, day_index): # pylint: disable=too-
     elif participant.is_overlapped() or participant.has_open_dialog():
         return
     elif day_index < 28:
-        # If paused today, skip - add pause days to retain followup-other-followup-other pattern
-
-        # Check to see if session still open the next day
-
-        # Only nudge open sessions during user's time window.
-
         if (day_index % 2) == 1: # Follow-up days
             follow_ups = [
                 'follow-up-warning-signs',

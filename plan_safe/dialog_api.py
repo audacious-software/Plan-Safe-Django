@@ -13,7 +13,6 @@ from django.utils.crypto import get_random_string
 from django.utils.safestring import mark_safe
 
 from django_dialog_engine.dialog import BaseNode, DialogTransition, DialogMachine
-
 from django_dialog_engine.models import DialogScript, apply_template
 
 from .models import Participant, SafetyPlan, CrisisHelpLine
@@ -374,6 +373,11 @@ class SendReasonsForLivingNode(BaseNode):
 
         # TODO: Add pause action that halts the dialog until all reasons have had a chance to get out.
 
+        # exit_actions.append({
+        #     'type': 'pause',
+        #     'duration': len(exit_actions) * self.seconds_between
+        # })
+
         transition = DialogTransition(new_state_id=self.next_node_id)
 
         transition.metadata['reason'] = 'plan-safe-send-reasons-for-living'
@@ -637,7 +641,7 @@ def initialize_dialog(dialog):
 def allow_session_nudge(session):
     session_dest = session.current_destination()
 
-    for participant in Participant.objects.all():
+    for participant in Participant.objects.all(): # pylint: disable=too-many-nested-blocks
         if participant.fetch_phone_number() == session_dest:
             now = participant.local_time(timezone.now())
 
@@ -653,8 +657,25 @@ def allow_session_nudge(session):
             if start <= now <= end:
                 return True
 
-            # TODO: Get dialog from session - get latest transition from dialog
-            #        - if transition is pause/send message < 60 seconds (make configurable), allow nudge
+            last_transition = session.dialog.transitions.order_by('-when').first()
+
+            if last_transition is not None:
+                for action in last_transition.metadata.get('actions', []):
+                    action_type = action.get('type', None)
+
+                    if action_type == 'store-value':
+                        return True
+
+                    if action_type == 'pause':
+                        duration = action.get('duration', None)
+
+                        max_pause = 60
+
+                        if hasattr(settings, 'PLAN_SAFE_NUDGE_MAX_PAUSE_DURATION'):
+                            max_pause = settings.PLAN_SAFE_NUDGE_MAX_PAUSE_DURATION
+
+                        if (duration is not None) and duration <= max_pause:
+                            return True
 
             return False
 

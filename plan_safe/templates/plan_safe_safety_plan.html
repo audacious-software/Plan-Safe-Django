@@ -103,7 +103,7 @@
 								<ul class="list-group mb-4">
 									<li class="list-group-item text-bg-light">
 										<strong>People for Distractions</strong>
-										<i class="bi bi-chat-left-fill float-end message-tooltip {% if safety_plan.message_distraction %}bi-chat-left-text-fill{% else %}bi-chat-left{% endif %}" data-bs-toggle="tooltip" data-bs-title="{{ safety_plan.message_distraction }}" data-type="message_distraction"></i>
+										<i class="bi bi-chat-left-fill float-end message-tooltip {% if safety_plan.message_distraction %}bi-chat-left-text-fill{% else %}bi-chat-left{% endif %}" {% if safety_plan.message_distraction %}data-bs-toggle="tooltip" data-bs-title="{{ safety_plan.message_distraction }}"{% endif %} data-type="message_distraction"></i>
 									</li>
 									<li class="list-group-item">
 										<small>
@@ -141,7 +141,7 @@
 								<ul class="list-group mb-4">
 									<li class="list-group-item text-bg-light">
 										<strong>People for Help</strong>
-										<i class="bi bi-chat-left-fill float-end message-tooltip {% if safety_plan.message_help %}bi-chat-left-text-fill{% else %}bi-chat-left{% endif %}" data-bs-toggle="tooltip" data-bs-title="{{ safety_plan.message_help }}" data-type="message_help"></i>
+										<i class="bi bi-chat-left-fill float-end message-tooltip {% if safety_plan.message_help %}bi-chat-left-text-fill{% else %}bi-chat-left{% endif %}" {% if safety_plan.message_help %}data-bs-toggle="tooltip" data-bs-title="{{ safety_plan.message_help }}"{% endif %} data-type="message_help"></i>
 									</li>
 									<li class="list-group-item">
 										<small>
@@ -245,7 +245,7 @@
 								<ul class="list-group mb-4">
 									<li class="list-group-item text-bg-light">
 										<strong>Medical Providers</strong>
-										<i class="bi bi-chat-left-fill float-end message-tooltip {% if safety_plan.message_medical_provider %}bi-chat-left-text-fill{% else %}bi-chat-left{% endif %}" data-bs-toggle="tooltip"  data-bs-title="{{ safety_plan.message_medical_provider }}" data-type="message_medical_provider"></i>
+										<i class="bi bi-chat-left-fill float-end message-tooltip {% if safety_plan.message_medical_provider %}bi-chat-left-text-fill{% else %}bi-chat-left{% endif %}" {% if safety_plan.message_medical_provider %}data-bs-toggle="tooltip"  data-bs-title="{{ safety_plan.message_medical_provider }}"{% endif %} data-type="message_medical_provider"></i>
 									</li>
 									<li class="list-group-item">
 										<small>
@@ -282,7 +282,7 @@
 								<ul class="list-group mb-4">
 									<li class="list-group-item text-bg-light">
 										<strong>Mental Health Providers</strong>
-										<i class="bi bi-chat-left-fill float-end message-tooltip {% if safety_plan.message_mental_health_provider %}bi-chat-left-text-fill{% else %}bi-chat-left{% endif %}" data-bs-toggle="tooltip" data-bs-title="{{ safety_plan.message_mental_health_provider }}" data-type="message_mental_health_provider"></i>
+										<i class="bi bi-chat-left-fill float-end message-tooltip {% if safety_plan.message_mental_health_provider %}bi-chat-left-text-fill{% else %}bi-chat-left{% endif %}" {% if safety_plan.message_mental_health_provider %}data-bs-toggle="tooltip" data-bs-title="{{ safety_plan.message_mental_health_provider }}"{% endif %} data-type="message_mental_health_provider"></i>
 									</li>
 									<li class="list-group-item">
 										<small>
@@ -421,30 +421,30 @@
 									<strong>Safety Plan Settings</strong>
 								</li>
 								<li class="list-group-item">
-									<button type="button" class="btn btn-outline-primary float-end mt-1"><i class="bi bi-pencil"></i></button>
+									<button type="button" class="btn btn-outline-primary float-end mt-1" id="edit_name"><i class="bi bi-pencil"></i></button>
 									{{ user.personalized_name }}<br />
 									<small>Preferred Name</small>
 								</li>
 								<li class="list-group-item">
-									<button type="button" class="btn btn-outline-primary float-end mt-1"><i class="bi bi-pencil"></i></button>
-									{{ user.time_zone }}<br />
+									<button type="button" class="btn btn-outline-primary float-end mt-1" id="edit_time_zone"><i class="bi bi-pencil"></i></button>
+									{{ user.time_zone.friendly_name }}<br />
 									<small>Time Zone</small>
 								</li>
 								<li class="list-group-item">
-									<button type="button" class="btn btn-outline-primary float-end mt-1"><i class="bi bi-pencil"></i></button>
+									<button type="button" class="btn btn-outline-primary float-end mt-1" id="edit_start"><i class="bi bi-pencil"></i></button>
 									{{ user.day_start }}<br />
 									<small>Day Start</small>
 								</li>
 								<li class="list-group-item">
-									<button type="button" class="btn btn-outline-primary float-end mt-1"><i class="bi bi-pencil"></i></button>
+									<button type="button" class="btn btn-outline-primary float-end mt-1" id="edit_end"><i class="bi bi-pencil"></i></button>
 									{{ user.day_end }}<br />
 									<small>Day End</small>
 								</li>
 								<li class="list-group-item">
 									{% if safety_plan.is_paused %}
-										<button type="button" class="btn btn-primary float-end mt-1">Resume</button>
+										<button type="button" class="btn btn-primary float-end mt-1" id="resume_plan">Resume</button>
 									{% else %}
-										<button type="button" class="btn btn-primary float-end mt-1">Pause</button>
+										<button type="button" class="btn btn-primary float-end mt-1" id="pause_plan">Pause</button>
 									{% endif %}
 									{{ safety_plan.pause_status }}<br />
 									<small>Pause Status</small>
@@ -457,6 +457,133 @@
 			</div>
 		</body>
 	{% endwith %}
+	<div class="modal" tabindex="-1" role="dialog" id="edit_name_dialog">
+		<div class="modal-dialog">
+		  <div class="modal-content">
+			<div class="modal-header">
+			  <h5 class="modal-title">Enter Preferred Name</h5>
+			  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<div class="mb-3">
+					<input type="text" class="form-control" id="edit_name_value" placeholder="Enter your preferred name&#8230;" value="{{ user.personalized_name }}" />
+				</div>
+			</div>
+			<div class="modal-footer">
+			  <button type="button" class="btn btn-primary" id="edit_name_save">Save</button>
+			  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+			</div>
+		  </div>
+		</div>
+	</div>
+  
+	<div class="modal" tabindex="-1" role="dialog" id="edit_time_zone_dialog">
+		<div class="modal-dialog">
+		  <div class="modal-content">
+			<div class="modal-header">
+			  <h5 class="modal-title">Choose Time Zone</h5>
+			  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<div class="mb-3">
+					<select class="form-select" aria-label="Time zone" id="edit_time_zone_value">
+            <option value="America/New_York" {% if user.time_zone.name == 'America/New_York' %}selected{% endif %}>Eastern Time Zone</option>
+            <option value="America/Chicago" {% if user.time_zone.name == 'America/Chicago' %}selected{% endif %}>Central Time Zone</option>
+            <option value="America/Denver" {% if user.time_zone.name == 'America/Denver' %}selected{% endif %}>Mountain Time Zone</option>
+            <option value="America/Los_Angeles" {% if user.time_zone.name == 'America/Los_Angeles' %}selected{% endif %}>Pacific Time Zone</option>
+            <option value="America/Anchorage" {% if user.time_zone.name == 'America/Anchorage' %}selected{% endif %}>Alaska Time Zone</option>
+            <option value="America/Honolulu" {% if user.time_zone.name == 'America/Honolulu' %}selected{% endif %}>Hawaii-Aleutian Time Zone</option>
+          </select>
+				</div>
+			</div>
+			<div class="modal-footer">
+			  <button type="button" class="btn btn-primary" id="edit_time_zone_save">Save</button>
+			  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+			</div>
+		  </div>
+		</div>
+	</div>
+
+	<div class="modal" tabindex="-1" role="dialog" id="edit_start_dialog">
+		<div class="modal-dialog">
+		  <div class="modal-content">
+			<div class="modal-header">
+			  <h5 class="modal-title">Daily Message Start Time</h5>
+			  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<div class="mb-3">
+					<input type="time" class="form-control" id="edit_start_value" value="{{ user.day_start|time:"H:i" }}" />
+				</div>
+			</div>
+			<div class="modal-footer">
+			  <button type="button" class="btn btn-primary" id="edit_start_save">Save</button>
+			  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+			</div>
+		  </div>
+		</div>
+	</div>
+
+	<div class="modal" tabindex="-1" role="dialog" id="edit_end_dialog">
+		<div class="modal-dialog">
+		  <div class="modal-content">
+			<div class="modal-header">
+			  <h5 class="modal-title">Daily Message End Time</h5>
+			  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<div class="mb-3">
+					<input type="time" class="form-control" id="edit_end_value" value="{{ user.day_end|time:"H:i" }}" />
+				</div>
+			</div>
+			<div class="modal-footer">
+			  <button type="button" class="btn btn-primary" id="edit_end_save">Save</button>
+			  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+			</div>
+		  </div>
+		</div>
+	</div>
+
+  <div class="modal" tabindex="-1" role="dialog" id="edit_pause_dialog">
+		<div class="modal-dialog">
+		  <div class="modal-content">
+			<div class="modal-header">
+			  <h5 class="modal-title">Pause Days</h5>
+			  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<div class="mb-3">
+					<input type="number" min="1" max="14" step="1" class="form-control" id="edit_pause_value" value="1" />
+				</div>
+			</div>
+			<div class="modal-footer">
+			  <button type="button" class="btn btn-primary" id="edit_pause_save">Save</button>
+			  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+			</div>
+		  </div>
+		</div>
+	</div>
+
+  <div class="modal" tabindex="-1" role="dialog" id="edit_resume_dialog">
+		<div class="modal-dialog">
+		  <div class="modal-content">
+			<div class="modal-header">
+			  <h5 class="modal-title">Resume Messaging Program</h5>
+			  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<div class="mb-3">
+          <p>Would you like to resume your messaging program starting tomorrow?</p>
+				</div>
+			</div>
+			<div class="modal-footer">
+			  <button type="button" class="btn btn-primary" id="edit_resume_save">Yes</button>
+			  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+			</div>
+		  </div>
+		</div>
+	</div>
+
 	<div class="modal" tabindex="-1" role="dialog" id="confirmation_dialog">
 		<div class="modal-dialog">
 		  <div class="modal-content">
@@ -474,6 +601,7 @@
 		  </div>
 		</div>
 	</div>
+
 	<div class="modal" tabindex="-1" role="dialog" id="message_dialog">
 		<div class="modal-dialog">
 		  <div class="modal-content">
@@ -493,6 +621,7 @@
 		  </div>
 		</div>
 	</div>
+
 	<div class="modal" tabindex="-1" role="dialog" id="preview_dialog">
 		<div class="modal-dialog">
 		  <div class="modal-content">

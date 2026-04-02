@@ -56,7 +56,7 @@
 										</div>
 									</th>
                                     <th class="mdc-data-table__header-cell mdc-data-table__header-cell--with-sort" role="columnheader" scope="col">Identifier</th>
-                                    <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Phone Number</th>
+                                    {% comment %}<th class="mdc-data-table__header-cell" role="columnheader" scope="col">Phone Number</th>{% endcomment %}
                                     <th class="mdc-data-table__header-cell" role="columnheader" scope="col">Study Arm</th>
                                     <th class="mdc-data-table__header-cell mdc-data-table__header-cell--with-sort" role="columnheader" scope="col" style="text-align: center;">Unread</th>
                                     <th class="mdc-data-table__header-cell" role="columnheader" scope="col" style="text-align: center;">Active</th>
@@ -79,7 +79,7 @@
 											</div>
 										</td>
                                         <td class="mdc-data-table__cell" scope="row"><a href="{% url 'simple_messaging_ui' %}?identifier={{ participant.identifier }}">{{ participant.identifier }}</a></td>
-                                        <td class="mdc-data-table__cell">{{ participant.obfuscated_phone_number }}</td>
+                                        {% comment %}<td class="mdc-data-table__cell">{{ participant.obfuscated_phone_number }}</td>{% endcomment %}
                                         <td class="mdc-data-table__cell">{{ participant.study_arm.name }}</td>
                                         <td class="mdc-data-table__cell">
                                         	{% with new_count=participant.new_message_count %}

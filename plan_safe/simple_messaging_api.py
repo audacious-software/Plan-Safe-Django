@@ -9,3 +9,7 @@ def fetch_phone_number(identifier):
         return matched.fetch_phone_number()
 
     return None
+
+def encrypt_addresses():
+    for participant in Participant.objects.all():
+        participant.set_phone_number(participant.fetch_phone_number())

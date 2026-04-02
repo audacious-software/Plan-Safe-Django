@@ -118,6 +118,11 @@ class Participant(models.Model):
         if self.time_zone is None:
             self.time_zone = TimeZone.objects.all().first()
 
+        if phone_number is None:
+            self.phone_number = None
+
+            return
+
         parsed_number = phonenumbers.parse(phone_number, self.time_zone.country_code)
 
         formatted_number = phonenumbers.format_number(parsed_number, phonenumbers.PhoneNumberFormat.E164)
@@ -133,12 +138,24 @@ class Participant(models.Model):
         return str(self.fetch_phone_number(obfuscated=True))
 
     def translate_to_localtime(self, original):
-        here_tz = pytz.timezone(self.time_zone.name)
+        here_tz = pytz.timezone(settings.TIME_ZONE)
+
+        try:
+            here_tz = pytz.timezone(self.time_zone.name)
+        except AttributeError:
+            pass
 
         return original.astimezone(here_tz)
 
     def fetch_safety_plan(self):
-        return self.safety_plans.order_by('-created').first()
+        plan = self.safety_plans.order_by('-created').first()
+
+        if plan is None:
+            now = timezone.now()
+
+            plan = SafetyPlan.objects.create(participant=self, created=now, last_updated=now)
+
+        return plan
 
     def get_absolute_url(self):
         if self.login_token is None or self.login_token == '':  # nosec
@@ -155,7 +172,7 @@ class Participant(models.Model):
         overlap_count = 0
 
         for date_str in overlap_dates:
-            when_date = datetime.date.strptime(date_str, '%Y-%m-%d')
+            when_date = datetime.datetime.strptime(date_str, '%Y-%m-%d').date()
 
             if when_date <= today:
                 overlap_count += 1
@@ -203,7 +220,7 @@ class Participant(models.Model):
         pause_count = 0
 
         for date_str in pause_dates:
-            when_date = datetime.date.strptime(date_str, '%Y-%m-%d')
+            when_date = datetime.datetime.strptime(date_str, '%Y-%m-%d').date()
 
             if when_date <= today:
                 pause_count += 1
@@ -235,6 +252,12 @@ class Participant(models.Model):
                 })
 
         return seen_dialogs
+
+    def add_pause_dates(self, days):
+        pass
+
+    def cancel_pause(self):
+        pass
 
     def local_time(self, when):
         here_tz = pytz.timezone(self.time_zone.name)

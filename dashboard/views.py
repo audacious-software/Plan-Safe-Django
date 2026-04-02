@@ -349,8 +349,11 @@ def dashboard_participants(request): # pylint: disable=too-many-locals, too-many
                 'reload': True
             }
 
+            participant.set_phone_number(participant.phone_number)
+
+            participant = Participant.objects.get(pk=participant.pk)
+
             participant.identifier = identifier
-            participant.phone_number = phone_number
             participant.time_zone = TimeZone.objects.get(name=time_zone)
             participant.study_arm = StudyArm.objects.get(identifier=study_arm)
             participant.day_start = datetime.datetime.strptime(start_time, '%H:%M').time()

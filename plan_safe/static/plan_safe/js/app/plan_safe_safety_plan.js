@@ -381,6 +381,149 @@ requirejs(['cookie', 'bootstrap', 'jquery'], function (Cookies, bootstrap) {
     }
   })
 
+  $('button#edit_name').off()
+  $('button#edit_name').click((eventObj) => {
+    eventObj.preventDefault()
+
+    $('button#edit_name_save').off()
+    $('button#edit_name_save').click(() => {
+      const newName = $('#edit_name_value').val()
+
+      const params = {
+        action: 'update_record',
+        section: 'name',
+        value: newName
+      }
+
+      $.post(window.location.href, params, function (response, status, jqXHR) {
+        $('#edit_name_dialog').modal('hide')
+
+        window.location.reload()
+      })
+    })
+
+    $('#edit_name_dialog').modal('show')
+  })  
+
+  $('button#edit_time_zone').off()
+  $('button#edit_time_zone').click((eventObj) => {
+    eventObj.preventDefault()
+
+    $('button#edit_time_zone_save').off()
+    $('button#edit_time_zone_save').click(() => {
+      const newTimeZone = $('#edit_time_zone_value').val()
+
+      const params = {
+        action: 'update_record',
+        section: 'time_zone',
+        value: newTimeZone
+      }
+
+      $.post(window.location.href, params, function (response, status, jqXHR) {
+        $('#edit_time_zone_dialog').modal('hide')
+
+        window.location.reload()
+      })
+    })
+
+    $('#edit_time_zone_dialog').modal('show')
+  })  
+
+  $('button#edit_start').off()
+  $('button#edit_start').click((eventObj) => {
+    eventObj.preventDefault()
+
+    $('button#edit_start_save').off()
+    $('button#edit_start_save').click(() => {
+      const newStart = $('#edit_start_value').val()
+
+      const params = {
+        action: 'update_record',
+        section: 'day_start',
+        value: newStart
+      }
+
+      $.post(window.location.href, params, function (response, status, jqXHR) {
+        $('#edit_start_dialog').modal('hide')
+
+        window.location.reload()
+      })
+    })
+
+    $('#edit_start_dialog').modal('show')
+  })  
+
+  $('button#edit_end').off()
+  $('button#edit_end').click((eventObj) => {
+    eventObj.preventDefault()
+
+    $('button#edit_end_save').off()
+    $('button#edit_end_save').click(() => {
+      const newEnd = $('#edit_end_value').val()
+
+      const params = {
+        action: 'update_record',
+        section: 'day_end',
+        value: newEnd
+      }
+
+      $.post(window.location.href, params, function (response, status, jqXHR) {
+        $('#edit_end_dialog').modal('hide')
+
+        window.location.reload()
+      })
+    })
+
+    $('#edit_end_dialog').modal('show')
+  })  
+
+  $('button#pause_plan').off()
+  $('button#pause_plan').click((eventObj) => {
+    eventObj.preventDefault()
+
+    $('button#edit_pause_save').off()
+    $('button#edit_pause_save').click(() => {
+      const newPause = $('#edit_pause_value').val()
+
+      const params = {
+        action: 'update_record',
+        section: 'pause',
+        value: newPause
+      }
+
+      $.post(window.location.href, params, function (response, status, jqXHR) {
+        $('#edit_pause_dialog').modal('hide')
+
+        window.location.reload()
+      })
+    })
+
+    $('#edit_pause_dialog').modal('show')
+  })  
+
+  $('button#resume_plan').off()
+  $('button#resume_plan').click((eventObj) => {
+    eventObj.preventDefault()
+
+    $('button#edit_resume_save').off()
+    $('button#edit_resume_save').click(() => {
+      const params = {
+        action: 'update_record',
+        section: 'resume',
+        value: 'now'
+      }
+
+      $.post(window.location.href, params, function (response, status, jqXHR) {
+        $('#edit_resume_dialog').modal('hide')
+
+        window.location.reload()
+      })
+    })
+
+    $('#edit_resume_dialog').modal('show')
+  })  
+  
+
   $('[data-bs-toggle="tooltip"]').tooltip()
 
   wireUpDelete()
