@@ -403,7 +403,7 @@ requirejs(['cookie', 'bootstrap', 'jquery'], function (Cookies, bootstrap) {
     })
 
     $('#edit_name_dialog').modal('show')
-  })  
+  })
 
   $('button#edit_time_zone').off()
   $('button#edit_time_zone').click((eventObj) => {
@@ -427,7 +427,7 @@ requirejs(['cookie', 'bootstrap', 'jquery'], function (Cookies, bootstrap) {
     })
 
     $('#edit_time_zone_dialog').modal('show')
-  })  
+  })
 
   $('button#edit_start').off()
   $('button#edit_start').click((eventObj) => {
@@ -451,7 +451,7 @@ requirejs(['cookie', 'bootstrap', 'jquery'], function (Cookies, bootstrap) {
     })
 
     $('#edit_start_dialog').modal('show')
-  })  
+  })
 
   $('button#edit_end').off()
   $('button#edit_end').click((eventObj) => {
@@ -475,7 +475,7 @@ requirejs(['cookie', 'bootstrap', 'jquery'], function (Cookies, bootstrap) {
     })
 
     $('#edit_end_dialog').modal('show')
-  })  
+  })
 
   $('button#pause_plan').off()
   $('button#pause_plan').click((eventObj) => {
@@ -499,7 +499,7 @@ requirejs(['cookie', 'bootstrap', 'jquery'], function (Cookies, bootstrap) {
     })
 
     $('#edit_pause_dialog').modal('show')
-  })  
+  })
 
   $('button#resume_plan').off()
   $('button#resume_plan').click((eventObj) => {
@@ -521,8 +521,7 @@ requirejs(['cookie', 'bootstrap', 'jquery'], function (Cookies, bootstrap) {
     })
 
     $('#edit_resume_dialog').modal('show')
-  })  
-  
+  })
 
   $('[data-bs-toggle="tooltip"]').tooltip()
 
