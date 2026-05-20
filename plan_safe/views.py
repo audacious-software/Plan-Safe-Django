@@ -362,7 +362,8 @@ def plan_safe_safety_plan(request, token): # pylint: disable=unused-argument, to
                         }
 
                         return HttpResponse(json.dumps(response_json, indent=2), content_type='application/json', status=200)
-                    elif section == 'time_zone':
+
+                    if section == 'time_zone':
                         token_user.time_zone = TimeZone.objects.filter(name=value).first()
                         token_user.save()
 
@@ -371,7 +372,8 @@ def plan_safe_safety_plan(request, token): # pylint: disable=unused-argument, to
                         }
 
                         return HttpResponse(json.dumps(response_json, indent=2), content_type='application/json', status=200)
-                    elif section == 'day_start':
+
+                    if section == 'day_start':
                         token_user.day_start = datetime.datetime.strptime(value, '%H:%M').time()
                         token_user.save()
 
@@ -380,7 +382,8 @@ def plan_safe_safety_plan(request, token): # pylint: disable=unused-argument, to
                         }
 
                         return HttpResponse(json.dumps(response_json, indent=2), content_type='application/json', status=200)
-                    elif section == 'day_end':
+
+                    if section == 'day_end':
                         token_user.day_end = datetime.datetime.strptime(value, '%H:%M').time()
                         token_user.save()
 
@@ -389,7 +392,8 @@ def plan_safe_safety_plan(request, token): # pylint: disable=unused-argument, to
                         }
 
                         return HttpResponse(json.dumps(response_json, indent=2), content_type='application/json', status=200)
-                    elif section == 'pause':
+
+                    if section == 'pause':
                         days = int(value)
 
                         token_user.add_pause_dates(days)
@@ -399,7 +403,8 @@ def plan_safe_safety_plan(request, token): # pylint: disable=unused-argument, to
                         }
 
                         return HttpResponse(json.dumps(response_json, indent=2), content_type='application/json', status=200)
-                    elif section == 'resume':
+
+                    if section == 'resume':
                         token_user.cancel_pause(days)
 
                         response_json = {

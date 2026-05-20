@@ -35,6 +35,7 @@ SUPPORTER_ROLES = (
     ('provider', 'Provider',),
 )
 
+
 class TimeZone(models.Model):
     name = models.CharField(max_length=1048576, unique=True)
     country_code = models.CharField(max_length=1048576)
@@ -68,7 +69,45 @@ class CrisisHelpLine(models.Model):
     def __str__(self):
         return str(self.name)
 
+    def contact_url(self):
+        if self.voice_url is not None:
+            return self.voice_url
+
+        if self.messaging_url is not None:
+            return self.messaging_url
+
+        if self.website is not None:
+            return self.website
+
+        return ''
+
+class ParticipantManager(models.Manager):
+    def generate_identifier(self, prefix='', digits=12):
+        identifier = None
+
+        while identifier is None:
+            numeric = '%s' % random.randint(0, (10 ** digits) - 1) # nosec
+
+            while len(numeric) < digits:
+                numeric = '0' + numeric
+
+            identifier = '%s%s' % (prefix, numeric)
+
+            if Participant.objects.filter(identifier=identifier).count() > 0:
+                identifier = None
+
+        return identifier
+
+    def create_participant(self, phone_number, personalized_name, time_zone, study_arm, start_time, end_time, identifier=None, metadata=dict): # pylint: disable=too-many-arguments
+        parsed = phonenumbers.parse(phone_number, settings.PHONE_REGION)
+
+        phone_number = phonenumbers.format_number(parsed, phonenumbers.PhoneNumberFormat.E164)
+
+        return Participant.objects.create(identifier=identifier, phone_number=phone_number, time_zone=TimeZone.objects.get(name=time_zone), study_arm=StudyArm.objects.get(identifier=study_arm), day_start=start_time, day_end=end_time, personalized_name=personalized_name, metadata=metadata)
+
 class Participant(models.Model):
+    objects = ParticipantManager()
+
     identifier = models.CharField(max_length=4096, null=True, blank=True)
     phone_number = models.CharField(max_length=4096, null=True, blank=True)
     personalized_name = models.CharField(max_length=4096, null=True, blank=True)
@@ -226,6 +265,9 @@ class Participant(models.Model):
                 pause_count += 1
 
         return pause_count
+
+    def remaining_pause_days(self):
+        return max(settings.PLAN_SAFE_MAX_PAUSE_DAYS - self.days_paused(), 0)
 
     def is_paused(self):
         pause_dates = self.metadata.get('pause_dates', [])
@@ -851,7 +893,7 @@ class SafetyPlan(models.Model): # pylint: disable=too-many-public-methods, too-m
         self.environmental_safety = None
         self.save()
 
-    def fetch_reason_for_living(self, sample_count=None, avoid_repeats=False, sequential=False): # pylint: disable=too-many-branches
+    def fetch_reason_for_living(self, sample_count=None, avoid_repeats=False, sequential=True): # pylint: disable=too-many-branches
         seen_reasons = self.metadata.get('seen_reasons_for_living', [])
 
         reasons = []
@@ -1024,9 +1066,9 @@ class SafetyPlan(models.Model): # pylint: disable=too-many-public-methods, too-m
 
     def pause_status(self):
         if self.is_paused():
-            return 'Not paused'
+            return 'Paused'
 
-        return 'Paused'
+        return 'Not paused - %s day(s) remaining' % self.participant.remaining_pause_days()
 
     def is_paused(self):
         return self.participant.is_paused()

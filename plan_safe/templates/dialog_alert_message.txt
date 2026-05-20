@@ -1,0 +1,7 @@
+The PlanSafe system received the following message that triggered the Automatic Risk Management System: 
+
+{{ alert.message }}
+
+Message: https://plan-safe.fsm.northwestern.edu/admin/simple_messaging/incomingmessage/{{ alert.metadata.last_incoming_message_pk }}/change/
+
+From "{{ alert.dialog.script }}" ({{ alert.dialog.key }})

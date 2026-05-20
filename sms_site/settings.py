@@ -154,8 +154,8 @@ DJANGO_DIALOG_ENGINE_TEMPLATE_LOADS = (
 SILENCED_SYSTEM_CHECKS = []
 
 HIDE_ADMIN_CLASSES = [
-    # 'simple_research.ResearchParticipation',
-    # 'simple_research.ResearchParticipant',
+    'simple_research.ResearchParticipation',
+    'simple_research.ResearchParticipant',
     # 'simple_research.ResearchStudy',
 ]
 
@@ -164,8 +164,11 @@ PLAN_SAFE_CONTROL_DELAY_DAYS = 28
 PLAN_SAFE_CONTROL_DELAY_URL = 'https://www.northwestern.edu'
 PLAN_SAFE_MINIMUM_WINDOW_HOURS = 10
 PLAN_SAFE_NUDGE_MAX_PAUSE_DURATION = 60
+PLAN_SAFE_MAX_PAUSE_DAYS = 3
 
 SIMPLE_DATA_EXPORTER_SITE_NAME = 'Plan Safe'
+
+PLAN_SAFE_UNMONITORED_MESSAGE = 'dialog:unmonitored-number'
 
 from .local_settings import *
 

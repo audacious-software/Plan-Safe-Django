@@ -6,7 +6,9 @@ import logging
 import traceback
 
 from django.conf import settings
+from django.core.mail import send_mail
 from django.template import engines
+from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.crypto import get_random_string
@@ -162,7 +164,6 @@ class UpdateSafetyPlanNode(BaseNode):
         ]
 
         return nodes
-
 
 class FetchReasonsForLivingNode(BaseNode):
     @staticmethod
@@ -562,7 +563,9 @@ def identify_script_issues(script): # pylint: disable=unused-argument
     return issues
 
 def fetch_destination_variables(destination):
-    variables = {}
+    variables = {
+        'automated_tag': '🤖'
+    }
 
     participant_found = False
 
@@ -586,6 +589,7 @@ def fetch_destination_variables(destination):
 
             variables['is_control'] = participant.metadata.get('is_control', False)
             variables['personal_url_enabled'] = (variables['is_control'] is False) # pylint: disable=superfluous-parens
+            variables['study_id'] = participant.identifier
 
     if participant_found is False:
         now = timezone.now()
@@ -638,8 +642,26 @@ def initialize_dialog(dialog):
 
         dialog.save()
 
-def allow_session_nudge(session):
+def allow_session_nudge(session): # pylint: disable=too-many-return-statements, too-many-branches
     session_dest = session.current_destination()
+
+    if session.dialog is not None and session.dialog.script is not None:
+        if 'always' in session.dialog.script.labels_list():
+            return True
+
+    # If dialog within embed
+
+    nudgable_substrings = [
+        '__safety-plan-now__',
+        '__menu-060525__',
+        '__automated-risk-management__',
+    ]
+
+    latest_transition = session.dialog.latest_transition()
+
+    for pattern in nudgable_substrings:
+        if pattern in latest_transition.state_id:
+            return True
 
     for participant in Participant.objects.all(): # pylint: disable=too-many-nested-blocks
         if participant.fetch_phone_number() == session_dest:
@@ -702,3 +724,16 @@ def launch_keyword_enabled(sender, keyword): # pylint: disable=unused-argument
             pass
 
     return True
+
+def handle_dialog_alert(alert):
+    session = alert.dialog.dialog_sessions.first()
+
+    keyword = session.fetch_latest_variables().get('keyword_interrupt_pattern_match', None)
+
+    send_mail(
+        settings.DIALOG_ALERT_SUBJECT,
+        render_to_string('dialog_alert_message.txt', {'alert': alert, 'keyword': keyword}),
+        settings.DIALOG_ALERT_FROM_ADDRESS,
+        settings.DIALOG_ALERT_TO_ADDRESSES,
+        fail_silently=False,
+    )

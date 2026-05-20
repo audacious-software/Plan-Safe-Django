@@ -444,10 +444,15 @@
 									{% if safety_plan.is_paused %}
 										<button type="button" class="btn btn-primary float-end mt-1" id="resume_plan">Resume</button>
 									{% else %}
-										<button type="button" class="btn btn-primary float-end mt-1" id="pause_plan">Pause</button>
+										{% if user.remaining_pause_days > 0 %}
+											<button type="button" class="btn btn-primary float-end mt-1" id="pause_plan">Pause</button>
+											{{ safety_plan.pause_status }}<br />
+											<small>Pause Status</small>
+										{% else %}
+											<button type="button" class="btn btn-primary float-end mt-1" id="pause_plan" disabled="true">Pause</button>
+											<div class="mt-2">No pause days remaining.</div>
+										{% endif %}
 									{% endif %}
-									{{ safety_plan.pause_status }}<br />
-									<small>Pause Status</small>
 								</li>
 							</ul>
 						</div>
@@ -552,8 +557,9 @@
 			  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 			</div>
 			<div class="modal-body">
-				<div class="mb-3">
-					<input type="number" min="1" max="14" step="1" class="form-control" id="edit_pause_value" value="1" />
+				<div class="mb-3 ali">
+					<input type="number" min="1" max="{{ user.remaining_pause_days }}" step="1" class="form-control mb-2" id="edit_pause_value" value="1" />
+					<small class="d-block text-center">{{ user.remaining_pause_days }} pause day(s) remaining.</small>
 				</div>
 			</div>
 			<div class="modal-footer">

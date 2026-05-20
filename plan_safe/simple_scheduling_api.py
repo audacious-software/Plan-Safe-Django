@@ -1,12 +1,10 @@
 # pylint: disable=line-too-long, no-member
 
-import json
 import logging
 import random
 import traceback
 
 from django.conf import settings
-from django.core.serializers.json import DjangoJSONEncoder
 from django.utils import timezone
 
 from django_dialog_engine.models import DialogScript
@@ -65,7 +63,7 @@ def schedule_day_message(participant, events, day_index): # pylint: disable=too-
 
             return
 
-        logger.warning('plan_safe.simple_scheduling_api: Dialog %s is not available for scheduling.', next_dialog_label)
+        logger.warning('plan_safe.simple_scheduling_api[%s]: Dialog %s is not available for scheduling.', participant, next_dialog_label)
     elif participant.is_paused():
         return
     elif participant.is_overlapped() or participant.has_open_dialog():
@@ -170,6 +168,19 @@ def schedule_day_message(participant, events, day_index): # pylint: disable=too-
                 'message': 'dialog:%s' % 'concluding-dialog',
             }
         })
+    # elif day_index > settings.INACTIVE_MESSAGE_DELAY: 169 days (24 weeks)
+    #     if ('study-finished-dialog' in seen_dialogs) is False:
+    #         events.append({
+    #             'event_key': event_key,
+    #             'action': 'simple_messaging.send_message',
+    #             'when': when,
+    #             'context': {
+    #                 'destination': participant.fetch_phone_number(),
+    #                 'message': 'dialog:%s' % 'study-finished-dialog',
+    #             }
+    #         })
+    #         # TODO: Add to blocked senders.
+
 
 def fetch_scheduled_events_control(): # pylint: disable=invalid-name
     events = []
