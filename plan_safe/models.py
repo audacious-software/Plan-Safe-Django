@@ -1,4 +1,4 @@
-# pylint: disable=no-member, line-too-long, too-many-lines
+# pylint: disable=no-member, line-too-long, too-many-lines, unsupported-assignment-operation
 
 import datetime
 import random
@@ -295,11 +295,47 @@ class Participant(models.Model):
 
         return seen_dialogs
 
-    def add_pause_dates(self, days):
-        pass
+    def add_pause_dates(self, day_count):
+        now = timezone.now()
+        pause_date = self.translate_to_localtime(now).date()
+
+        pause_dates = self.metadata.get('pause_dates', [])
+
+        while day_count > 0:
+            pause_date = pause_date + datetime.timedelta(days=1)
+
+            pause_str = pause_date.isoformat()
+
+            if (pause_str in pause_dates) is False:
+                pause_dates.append(pause_str)
+
+            day_count -= 1
+
+        self.metadata['pause_dates'] = pause_dates
+        self.save()
 
     def cancel_pause(self):
-        pass
+        now = timezone.now()
+
+        today = self.translate_to_localtime(now).date()
+        tomorrow = today + datetime.timedelta(days=1)
+
+        tomorrow_str = tomorrow.isoformat()
+
+        pause_dates = self.metadata.get('pause_dates', [])
+
+        to_remove = []
+
+        for pause_day in pause_dates:
+            if pause_day >= tomorrow_str:
+                to_remove.append(pause_day)
+
+        for remove_day in to_remove:
+            while remove_day in pause_dates:
+                pause_dates.remove(remove_day)
+
+        self.metadata['pause_dates'] = pause_dates
+        self.save()
 
     def local_time(self, when):
         here_tz = pytz.timezone(self.time_zone.name)
@@ -387,12 +423,12 @@ class SafetyPlan(models.Model): # pylint: disable=too-many-public-methods, too-m
 
         for remove_item in to_remove:
             for item in updated_list:
-                if isinstance(item, UserDict):
-                    item_name = item.get('value', '')
+                if isinstance(item, (UserDict, dict)):
+                    item_name = item.get('value', item.get('name', ''))
 
                     if str(item_name).strip().lower() == str(remove_item).lower():
                         while item in new_list:
-                            new_list.remove(str(item))
+                            new_list.remove(item)
 
                 elif str(item).strip().lower() == str(remove_item).strip().lower():
                     while item in new_list:

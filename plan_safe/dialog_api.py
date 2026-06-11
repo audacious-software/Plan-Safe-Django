@@ -569,8 +569,8 @@ def fetch_destination_variables(destination):
 
     participant_found = False
 
-    for participant in Participant.objects.all():
-        if participant.fetch_phone_number() == destination:
+    for participant in Participant.objects.filter(active=True).order_by('-created'):
+        if participant_found is False and participant.fetch_phone_number() == destination:
             participant_found = True
 
             variables['plan_safe_safety_plan_url'] = participant.get_absolute_url()
@@ -590,6 +590,9 @@ def fetch_destination_variables(destination):
             variables['is_control'] = participant.metadata.get('is_control', False)
             variables['personal_url_enabled'] = (variables['is_control'] is False) # pylint: disable=superfluous-parens
             variables['study_id'] = participant.identifier
+        elif participant_found is True and participant.identifier.startswith('TESTING-'):
+            participant.active = False
+            participant.save()
 
     if participant_found is False:
         now = timezone.now()
@@ -682,7 +685,12 @@ def allow_session_nudge(session): # pylint: disable=too-many-return-statements, 
             last_transition = session.dialog.transitions.order_by('-when').first()
 
             if last_transition is not None:
-                for action in last_transition.metadata.get('actions', []):
+                actions = last_transition.metadata.get('actions', None)
+
+                if actions is None:
+                    actions = []
+
+                for action in actions:
                     action_type = action.get('type', None)
 
                     if action_type == 'store-value':

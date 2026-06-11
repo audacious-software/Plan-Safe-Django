@@ -443,6 +443,7 @@
 								<li class="list-group-item">
 									{% if safety_plan.is_paused %}
 										<button type="button" class="btn btn-primary float-end mt-1" id="resume_plan">Resume</button>
+										<div class="mt-2 d-inline-block">Currently paused.</div>
 									{% else %}
 										{% if user.remaining_pause_days > 0 %}
 											<button type="button" class="btn btn-primary float-end mt-1" id="pause_plan">Pause</button>

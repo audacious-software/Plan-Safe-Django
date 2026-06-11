@@ -405,7 +405,7 @@ def plan_safe_safety_plan(request, token): # pylint: disable=unused-argument, to
                         return HttpResponse(json.dumps(response_json, indent=2), content_type='application/json', status=200)
 
                     if section == 'resume':
-                        token_user.cancel_pause(days)
+                        token_user.cancel_pause()
 
                         response_json = {
                             'message': 'Success. Pause cancelled.'

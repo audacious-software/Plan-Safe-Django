@@ -50,11 +50,10 @@ def process_records(records): # pylint: disable=too-many-locals, too-many-branch
             enrolled = Participant.objects.filter(metadata__redcap_id=identifier).first()
 
             if enrolled is not None:
-                print('ALREADY ENROLLED: %s - %s - %s' % (identifier, condition, enrolled.pk))
-
-                # print(json.dumps(record, indent=2))
+                # print('ALREADY ENROLLED: %s - %s - %s' % (identifier, condition, enrolled.pk))
+                pass
             else:
-                print('CREATE RECORD FOR: %s - %s' % (identifier, condition))
+                # print('CREATE RECORD FOR: %s - %s' % (identifier, condition))
 
                 local_id = Participant.objects.generate_identifier(prefix='RCT-', digits=8)
 
