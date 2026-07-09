@@ -13,7 +13,7 @@ from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils import timezone
 
-from .models import Participant, CrisisHelpLine, ReasonForLiving, TimeZone
+from .models import Participant, CrisisHelpLine, ReasonForLiving, TimeZone, post_save_safety_plan_version
 
 def plan_safe_safety_plan(request, token): # pylint: disable=unused-argument, too-many-branches, too-many-locals, too-many-return-statements, too-many-statements
     if token.endswith('.'):
@@ -309,17 +309,19 @@ def plan_safe_safety_plan(request, token): # pylint: disable=unused-argument, to
                     line_pk = int(request.POST.get('line',  '-1'))
                     selected = request.POST.get('checked',  'false') == 'true'
 
-                    help_line = CrisisHelpLine.objects.filter(pk=line_pk).first()
+                    help_line = CrisisHelpLine.objects.filter(order_label=line_pk).first()
+
+                    response_json = {
+                        'message': 'Success. Line selection updated.'
+                    }
 
                     if help_line is not None:
                         if selected:
                             safety_plan.crisis_help_lines.add(help_line)
                         else:
                             safety_plan.crisis_help_lines.remove(help_line)
-
-                    response_json = {
-                        'message': 'Success. Line selection updated.'
-                    }
+                    else:
+                        response_json['message'] = 'Unable to find help line with order_label=%s' % line_pk
 
                     return HttpResponse(json.dumps(response_json, indent=2), content_type='application/json', status=200)
                 elif action == 'add-reason':

@@ -215,7 +215,7 @@ class FetchReasonsForLivingNode(BaseNode):
     def evaluate(self, dialog, response=None, last_transition=None, extras=None, logger=None): # pylint: disable=too-many-arguments, too-many-locals, too-many-branches, too-many-statements, unused-argument
         safety_plan = extras.get('plan_safe_safety_plan', None)
 
-        reasons = safety_plan.fetch_reason_for_living(sample_count=self.sample_count, avoid_repeats=self.avoid_repeats)
+        reasons = safety_plan.fetch_reason_for_living(sample_count=self.sample_count, avoid_repeats=self.avoid_repeats, skip_updates=(self.avoid_repeats is False))
 
         if len(reasons) == 0:
             transition = DialogTransition(new_state_id=self.empty_node_id)
@@ -324,7 +324,7 @@ class SendReasonsForLivingNode(BaseNode):
         if self.mode == 'random':
             reasons = safety_plan.fetch_reason_for_living(sample_count=sample_count, avoid_repeats=False)
         elif self.mode == 'random_no_repeat':
-            reasons = safety_plan.fetch_reason_for_living(sample_count=sample_count, avoid_repeats=True)
+            reasons = safety_plan.fetch_reason_for_living(sample_count=sample_count, avoid_repeats=True, skip_updates=False)
 
         if len(reasons) == 0:
             transition = DialogTransition(new_state_id=self.next_node_id)
@@ -570,29 +570,30 @@ def fetch_destination_variables(destination):
     participant_found = False
 
     for participant in Participant.objects.filter(active=True).order_by('-created'):
-        if participant_found is False and participant.fetch_phone_number() == destination:
-            participant_found = True
+        if participant.fetch_phone_number() == destination:
+            if participant_found is False:
+                participant_found = True
 
-            variables['plan_safe_safety_plan_url'] = participant.get_absolute_url()
+                variables['plan_safe_safety_plan_url'] = participant.get_absolute_url()
 
-            variables['plan_safe_contact_card_url'] = 'https://%s%s' % (settings.ALLOWED_HOSTS[0], reverse('plan_safe_contact_card', args=[participant.login_token]))
+                variables['plan_safe_contact_card_url'] = 'https://%s%s' % (settings.ALLOWED_HOSTS[0], reverse('plan_safe_contact_card', args=[participant.login_token]))
 
-            safety_plan = participant.safety_plans.order_by('-created').first()
+                safety_plan = participant.safety_plans.order_by('-created').first()
 
-            if safety_plan is None:
-                safety_plan = SafetyPlan.objects.create(participant=participant)
+                if safety_plan is None:
+                    safety_plan = SafetyPlan.objects.create(participant=participant)
 
-            variables['plan_safe_safety_plan'] = safety_plan
-            variables['safety_plan'] = safety_plan
+                variables['plan_safe_safety_plan'] = safety_plan
+                variables['safety_plan'] = safety_plan
 
-            variables['crisis_lines'] = CrisisHelpLine.objects.all().order_by('order_label')
+                variables['crisis_lines'] = CrisisHelpLine.objects.all().order_by('order_label')
 
-            variables['is_control'] = participant.metadata.get('is_control', False)
-            variables['personal_url_enabled'] = (variables['is_control'] is False) # pylint: disable=superfluous-parens
-            variables['study_id'] = participant.identifier
-        elif participant_found is True and participant.identifier.startswith('TESTING-'):
-            participant.active = False
-            participant.save()
+                variables['is_control'] = participant.metadata.get('is_control', False)
+                variables['personal_url_enabled'] = (variables['is_control'] is False) # pylint: disable=superfluous-parens
+                variables['study_id'] = participant.identifier
+            elif participant_found is True and participant.identifier.startswith('TESTING-'):
+                participant.active = False
+                participant.save()
 
     if participant_found is False:
         now = timezone.now()

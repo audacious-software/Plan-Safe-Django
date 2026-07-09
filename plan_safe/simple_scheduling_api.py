@@ -138,7 +138,7 @@ def schedule_day_message(participant, events, day_index): # pylint: disable=too-
                 events.append({
                     'event_key': event_key,
                     'action': 'simple_messaging.send_message',
-                    'when': when,
+                    'when': when.isoformat(),
                     'context': {
                         'destination': participant.fetch_phone_number(),
                         'message': 'dialog:%s' % other_dialogs[0],
@@ -150,7 +150,7 @@ def schedule_day_message(participant, events, day_index): # pylint: disable=too-
                 events.append({
                     'event_key': event_key,
                     'action': 'simple_messaging.send_message',
-                    'when': when,
+                    'when': when.isoformat(),
                     'context': {
                         'destination': participant.fetch_phone_number(),
                         'message': 'dialog:on-demand-dialogs-060625'
@@ -162,7 +162,7 @@ def schedule_day_message(participant, events, day_index): # pylint: disable=too-
         events.append({
             'event_key': event_key,
             'action': 'simple_messaging.send_message',
-            'when': when,
+            'when': when.isoformat(),
             'context': {
                 'destination': participant.fetch_phone_number(),
                 'message': 'dialog:%s' % 'concluding-dialog',
@@ -173,7 +173,7 @@ def schedule_day_message(participant, events, day_index): # pylint: disable=too-
     #         events.append({
     #             'event_key': event_key,
     #             'action': 'simple_messaging.send_message',
-    #             'when': when,
+    #             'when': when.isoformat(),
     #             'context': {
     #                 'destination': participant.fetch_phone_number(),
     #                 'message': 'dialog:%s' % 'study-finished-dialog',
@@ -211,10 +211,12 @@ def fetch_scheduled_events_control(): # pylint: disable=invalid-name
                 }
             })
         elif day_index == 0: # After delay
+            when = participant.fetch_today_start()
+
             events.append({
                 'event_key': event_key,
                 'action': 'simple_messaging.send_message',
-                'when': now.isoformat(),
+                'when': when.isoformat(),
                 'context': {
                     'destination': participant.fetch_phone_number(),
                     'message': 'dialog:%s' % 'welcome-dialog',

@@ -17,7 +17,7 @@ import requests
 from django.conf import settings
 from django.core.files.base import ContentFile
 from django.db import models
-from django.db.models.signals import pre_save
+from django.db.models.signals import pre_save, post_save, m2m_changed
 from django.dispatch import receiver
 from django.urls import reverse
 from django.utils import timezone
@@ -929,7 +929,7 @@ class SafetyPlan(models.Model): # pylint: disable=too-many-public-methods, too-m
         self.environmental_safety = None
         self.save()
 
-    def fetch_reason_for_living(self, sample_count=None, avoid_repeats=False, sequential=True): # pylint: disable=too-many-branches
+    def fetch_reason_for_living(self, sample_count=None, avoid_repeats=False, sequential=True, skip_update=True): # pylint: disable=too-many-branches
         seen_reasons = self.metadata.get('seen_reasons_for_living', [])
 
         reasons = []
@@ -971,8 +971,9 @@ class SafetyPlan(models.Model): # pylint: disable=too-many-public-methods, too-m
         if len(seen_reasons) >= len(reasons):
             seen_reasons = []
 
-        self.metadata['seen_reasons_for_living'] = seen_reasons # pylint: disable=unsupported-assignment-operation
-        self.save()
+        if skip_update is False:
+            self.metadata['seen_reasons_for_living'] = seen_reasons # pylint: disable=unsupported-assignment-operation
+            self.save()
 
         return unseen
 
@@ -1129,6 +1130,78 @@ class SafetyPlan(models.Model): # pylint: disable=too-many-public-methods, too-m
 @receiver(pre_save, sender=SafetyPlan)
 def pre_save_user(sender, instance, **kwargs): # pylint: disable=unused-argument
     instance.last_updated = timezone.now()
+
+@receiver(post_save, sender=SafetyPlan)
+def post_save_safety_plan_version(sender, instance, **kwargs): # pylint: disable=unused-argument
+    new_version = SafetyPlanVersion(safety_plan=instance, version_created=timezone.now())
+
+    new_version.participant = instance.participant
+    new_version.created = instance.created
+    new_version.last_updated = instance.last_updated
+
+    new_version.warning_signs = instance.warning_signs
+    new_version.coping_skills = instance.coping_skills
+    new_version.environmental_safety = instance.environmental_safety
+    
+    new_version.people_distraction = instance.people_distraction
+    new_version.message_distraction = instance.message_distraction
+    
+    new_version.people_help = instance.people_help
+    new_version.message_help = instance.message_help
+    
+    new_version.people_medical_provider = instance.people_medical_provider
+    new_version.message_medical_provider = instance.message_medical_provider
+    
+    new_version.people_mental_health_provider = instance.people_mental_health_provider
+    new_version.message_mental_health_provider = instance.message_mental_health_provider
+    
+    new_version.people_provider = instance.people_provider
+    
+    new_version.metadata = instance.metadata
+
+    new_version.save()
+
+    for crisis_help_line in instance.crisis_help_lines.all():
+        new_version.crisis_help_lines.add(crisis_help_line)
+
+@receiver(m2m_changed, sender=SafetyPlan.crisis_help_lines.through)
+def post_save_safety_plan_version_crisis_lines(sender, instance, action, pk_set, **kwargs):
+    if action in ('post_add', 'post_remove', 'post_clear',):
+        post_save_safety_plan_version(sender=sender, instance=instance)
+
+class SafetyPlanVersion(models.Model): # pylint: disable=too-many-public-methods, too-many-instance-attributes
+    safety_plan = models.ForeignKey(SafetyPlan, null=True, blank=True, related_name='versions', on_delete=models.SET_NULL)
+    version_created = models.DateTimeField()
+
+    participant = models.ForeignKey(Participant, null=True, blank=True, related_name='safety_plan_versions', on_delete=models.SET_NULL)
+
+    created = models.DateTimeField(default=timezone.now)
+    last_updated = models.DateTimeField(default=timezone.now)
+
+    warning_signs = models.TextField(max_length=1048576, null=True, blank=True,)
+    coping_skills = models.TextField(max_length=1048576, null=True, blank=True,)
+    environmental_safety = models.TextField(max_length=1048576, null=True, blank=True,)
+
+    crisis_help_lines = models.ManyToManyField(CrisisHelpLine, related_name='safety_plans_versions')
+
+    people_distraction = models.TextField(max_length=1048576, null=True, blank=True,)
+    message_distraction = models.TextField(max_length=8192, null=True, blank=True,)
+
+    people_help = models.TextField(max_length=1048576, null=True, blank=True,)
+    message_help = models.TextField(max_length=8192, null=True, blank=True,)
+
+    people_medical_provider = models.TextField(max_length=1048576, null=True, blank=True,)
+    message_medical_provider = models.TextField(max_length=8192, null=True, blank=True,)
+
+    people_mental_health_provider = models.TextField(max_length=1048576, null=True, blank=True,)
+    message_mental_health_provider = models.TextField(max_length=8192, null=True, blank=True,)
+
+    people_provider = models.TextField(max_length=1048576, null=True, blank=True,)
+
+    metadata = models.JSONField(default=dict, blank=True)
+
+    def __str__(self):
+        return '%s (%s)' % (self.safety_plan, self.version_created)
 
 class Supporter(models.Model):
     safety_plan = models.ForeignKey(SafetyPlan, related_name='supporters', null=True, blank=True, on_delete=models.SET_NULL)

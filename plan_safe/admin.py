@@ -10,7 +10,7 @@ try:
 except ImportError:
     from django.contrib.postgres.fields import JSONField
 
-from .models import Participant, TimeZone, StudyArm, SafetyPlan, ReasonForLiving, CrisisHelpLine
+from .models import Participant, TimeZone, StudyArm, SafetyPlan, SafetyPlanVersion, ReasonForLiving, CrisisHelpLine
 
 class PrettyJSONWidgetFixed(PrettyJSONWidget):
     def render(self, name, value, attrs=None, **kwargs):
@@ -49,6 +49,33 @@ class StudyArmAdmin(admin.ModelAdmin):
 @admin.register(SafetyPlan)
 class SafetyPlanAdmin(admin.ModelAdmin):
     list_display = ('participant', 'created', 'last_updated')
+
+@admin.register(SafetyPlanVersion)
+class SafetyPlanVersionAdmin(admin.ModelAdmin):
+    list_display = ('participant', 'safety_plan', 'version_created')
+    list_filter = ('version_created', 'participant',)
+
+    readonly_fields = (
+        'safety_plan',
+        'version_created',
+        'participant',
+        'created',
+        'last_updated',
+        'warning_signs',
+        'coping_skills',
+        'environmental_safety',
+        'people_distraction',
+        'message_distraction',
+        'people_help',
+        'message_help',
+        'people_medical_provider',
+        'message_medical_provider',
+        'people_mental_health_provider',
+        'message_mental_health_provider',
+        'people_provider',
+        'metadata',
+        'crisis_help_lines',
+    )
 
 @admin.register(ReasonForLiving)
 class ReasonForLivingAdmin(admin.ModelAdmin):
