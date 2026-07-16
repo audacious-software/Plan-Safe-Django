@@ -235,7 +235,12 @@ class Participant(models.Model):
 
         for session in DialogSession.objects.filter(finished=None):
             if session.current_destination() == self.current_phone_number():
-                if now.time() > self.day_start:
+                if session.dialog.key == 'wildcard-keyword-launcher':
+                    return True
+
+                session_start = self.translate_to_localtime(session.started)
+
+                if now.date() != session_start.date():
                     overlap_dates = self.metadata.get('overlap_dates', [])
 
                     when_key = now.date().isoformat()
