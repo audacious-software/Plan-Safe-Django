@@ -215,7 +215,7 @@ class FetchReasonsForLivingNode(BaseNode):
     def evaluate(self, dialog, response=None, last_transition=None, extras=None, logger=None): # pylint: disable=too-many-arguments, too-many-locals, too-many-branches, too-many-statements, unused-argument
         safety_plan = extras.get('plan_safe_safety_plan', None)
 
-        reasons = safety_plan.fetch_reason_for_living(sample_count=self.sample_count, avoid_repeats=self.avoid_repeats, skip_updates=(self.avoid_repeats is False))
+        reasons = safety_plan.fetch_reason_for_living(sample_count=self.sample_count, avoid_repeats=self.avoid_repeats, skip_update=(self.avoid_repeats is False)) # pylint: disable=superfluous-parens
 
         if len(reasons) == 0:
             transition = DialogTransition(new_state_id=self.empty_node_id)
@@ -324,7 +324,7 @@ class SendReasonsForLivingNode(BaseNode):
         if self.mode == 'random':
             reasons = safety_plan.fetch_reason_for_living(sample_count=sample_count, avoid_repeats=False)
         elif self.mode == 'random_no_repeat':
-            reasons = safety_plan.fetch_reason_for_living(sample_count=sample_count, avoid_repeats=True, skip_updates=False)
+            reasons = safety_plan.fetch_reason_for_living(sample_count=sample_count, avoid_repeats=True, skip_update=False)
 
         if len(reasons) == 0:
             transition = DialogTransition(new_state_id=self.next_node_id)

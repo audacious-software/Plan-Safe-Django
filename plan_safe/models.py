@@ -1147,21 +1147,21 @@ def post_save_safety_plan_version(sender, instance, **kwargs): # pylint: disable
     new_version.warning_signs = instance.warning_signs
     new_version.coping_skills = instance.coping_skills
     new_version.environmental_safety = instance.environmental_safety
-    
+
     new_version.people_distraction = instance.people_distraction
     new_version.message_distraction = instance.message_distraction
-    
+
     new_version.people_help = instance.people_help
     new_version.message_help = instance.message_help
-    
+
     new_version.people_medical_provider = instance.people_medical_provider
     new_version.message_medical_provider = instance.message_medical_provider
-    
+
     new_version.people_mental_health_provider = instance.people_mental_health_provider
     new_version.message_mental_health_provider = instance.message_mental_health_provider
-    
+
     new_version.people_provider = instance.people_provider
-    
+
     new_version.metadata = instance.metadata
 
     new_version.save()
@@ -1170,7 +1170,7 @@ def post_save_safety_plan_version(sender, instance, **kwargs): # pylint: disable
         new_version.crisis_help_lines.add(crisis_help_line)
 
 @receiver(m2m_changed, sender=SafetyPlan.crisis_help_lines.through)
-def post_save_safety_plan_version_crisis_lines(sender, instance, action, pk_set, **kwargs):
+def post_save_safety_plan_version_crisis_lines(sender, instance, action, pk_set, **kwargs): # pylint: disable=invalid-name, unused-argument
     if action in ('post_add', 'post_remove', 'post_clear',):
         post_save_safety_plan_version(sender=sender, instance=instance)
 

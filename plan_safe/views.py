@@ -13,7 +13,7 @@ from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils import timezone
 
-from .models import Participant, CrisisHelpLine, ReasonForLiving, TimeZone, post_save_safety_plan_version
+from .models import Participant, CrisisHelpLine, ReasonForLiving, TimeZone
 
 def plan_safe_safety_plan(request, token): # pylint: disable=unused-argument, too-many-branches, too-many-locals, too-many-return-statements, too-many-statements
     if token.endswith('.'):
