@@ -14,7 +14,7 @@ wheel
 -r simple_scheduling/requirements.txt
 
 django-anymail==14.0; python_version < '3.9'
-django-anymail==15.0; python_version >= '3.9'
+django-anymail==15.1; python_version >= '3.9'
 django-auth-ldap==4.0.0; python_version < '3.7'
 django-auth-ldap==4.1.0; python_version == '3.7'
 django-auth-ldap==5.0.0; python_version == '3.8'
