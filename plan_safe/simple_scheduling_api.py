@@ -86,6 +86,9 @@ def schedule_day_message(participant, events, day_index): # pylint: disable=too-
                 if seen_dialog['identifier'] in follow_ups:
                     follow_ups.remove(seen_dialog['identifier'])
 
+                if seen_dialog['identifier'] == 'on-demand-dialogs-060625':
+                    seen_on_demand = True
+
                 if last_sent is None or last_sent < seen_dialog['when'].date():
                     last_sent = seen_dialog['when'].date()
 
@@ -104,6 +107,19 @@ def schedule_day_message(participant, events, day_index): # pylint: disable=too-
                         'message': 'dialog:%s' % follow_ups[0],
                     }
                 })
+            elif seen_on_demand is False:
+                when = participant.fetch_today_start()
+
+                events.append({
+                    'event_key': event_key,
+                    'action': 'simple_messaging.send_message',
+                    'when': when.isoformat(),
+                    'context': {
+                        'destination': participant.fetch_phone_number(),
+                        'message': 'dialog:on-demand-dialogs-060625'
+                    }
+                })
+
         else: # Other days
             other_dialogs = []
 
@@ -120,9 +136,6 @@ def schedule_day_message(participant, events, day_index): # pylint: disable=too-
             for seen_dialog in seen_dialogs:
                 if seen_dialog['identifier'] in other_dialogs:
                     other_dialogs.remove(seen_dialog['identifier'])
-
-                if seen_dialog['identifier'] == 'on-demand-dialogs-060625':
-                    seen_on_demand = True
 
                 if last_sent is None or last_sent < seen_dialog['when'].date():
                     last_sent = seen_dialog['when'].date()
@@ -144,18 +157,8 @@ def schedule_day_message(participant, events, day_index): # pylint: disable=too-
                         'message': 'dialog:%s' % other_dialogs[0],
                     }
                 })
-            elif seen_on_demand is False:
-                when = participant.fetch_today_start()
-
-                events.append({
-                    'event_key': event_key,
-                    'action': 'simple_messaging.send_message',
-                    'when': when.isoformat(),
-                    'context': {
-                        'destination': participant.fetch_phone_number(),
-                        'message': 'dialog:on-demand-dialogs-060625'
-                    }
-                })
+            else:
+                schedule_day_message(participant, events, day_index + 1)
 
     elif day_index == 28:
         when = participant.fetch_today_start()
