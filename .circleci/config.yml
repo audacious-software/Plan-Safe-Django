@@ -43,6 +43,7 @@ jobs:
             which python
             which python3
             python3 -m venv /home/circleci/venv
+            find /home/circleci/venv
             . /home/circleci/venv/bin/activate
             pip install -U pip
             pip install -U wheel
