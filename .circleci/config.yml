@@ -115,6 +115,7 @@ jobs:
             git submodule init
             git submodule update
             python3 -m venv /home/circleci/venv
+            find /home/circleci/venv
             . /home/circleci/venv/bin/activate
             pip install -U pip
             pip install -U wheel
