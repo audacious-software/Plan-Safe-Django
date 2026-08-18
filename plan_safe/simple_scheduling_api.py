@@ -20,6 +20,8 @@ def schedule_day_message(participant, events, day_index): # pylint: disable=too-
 
     seen_dialogs = participant.fetch_dialogs(seen=True)
 
+    seen_on_demand = False
+
     event_key = '%s_day_%s' % (participant.identifier, day_index)
 
     if day_index <= 7:
@@ -130,8 +132,6 @@ def schedule_day_message(participant, events, day_index): # pylint: disable=too-
                     other_dialogs.append(script.identifier)
 
             last_sent = None
-
-            seen_on_demand = False
 
             for seen_dialog in seen_dialogs:
                 if seen_dialog['identifier'] in other_dialogs:
