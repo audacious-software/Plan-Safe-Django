@@ -55,3 +55,5 @@ def process_incoming_message(incoming_message):
         outgoing.encrypt_destination()
 
         call_command('simple_messaging_send_pending_messages')
+
+    # Wire up "end program" / "resume program" function to set user as inactive

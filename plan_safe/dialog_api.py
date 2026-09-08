@@ -739,6 +739,8 @@ def handle_dialog_alert(alert):
 
     keyword = session.fetch_latest_variables().get('keyword_interrupt_pattern_match', None)
 
+    print('settings.DIALOG_ALERT_TO_ADDRESSES: %s' % settings.DIALOG_ALERT_TO_ADDRESSES)
+
     send_mail(
         settings.DIALOG_ALERT_SUBJECT,
         render_to_string('dialog_alert_message.txt', {'alert': alert, 'keyword': keyword}),
