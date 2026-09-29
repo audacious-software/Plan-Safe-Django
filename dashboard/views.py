@@ -23,7 +23,7 @@ from django.utils.text import slugify
 from django_dialog_engine.models import DialogScript, Dialog
 
 from simple_messaging.models import IncomingMessage, OutgoingMessage, OutgoingMessageMedia
-from simple_messaging_dialog_support.models import DialogSession
+from simple_messaging_dialog_support.models import DialogSession, DialogAlert
 
 from plan_safe.models import Participant, TimeZone, StudyArm
 
@@ -522,3 +522,34 @@ def dashboard_new_identifier(request): # pylint: disable=unused-argument
             identifier = None
 
     return HttpResponse(json.dumps({'identifier': identifier}, indent=2), content_type='application/json')
+
+@never_cache
+@login_required
+def dashboard_dialog_alerts(request):
+    context = {}
+
+    offset = int(request.GET.get('offset', '0'))
+    limit = int(request.GET.get('limit', '25'))
+
+    alerts = DialogAlert.objects.all().order_by('-last_updated')
+
+    total = alerts.count()
+
+    context['alerts'] = alerts[offset:(offset + limit)]
+    context['start'] = offset + 1
+    context['end'] = min(total, (offset + limit))
+    context['total'] = total
+
+    if (offset - limit) >= 0:
+        context['previous'] = '%s?offset=%s&limit=%s' % (reverse('dashboard_alerts'), offset - limit, limit,)
+
+    if (offset + limit) < total:
+        context['next'] = '%s?offset=%s&limit=%s' % (reverse('dashboard_alerts'), offset + limit, limit,)
+
+    context['first'] = '%s?offset=0&limit=%s' % (reverse('dashboard_alerts'), limit,)
+
+    last = int(total / limit) * limit
+
+    context['last'] = '%s?offset=%s&limit=%s' % (reverse('dashboard_alerts'), last, limit,)
+
+    return render(request, 'dashboard_dialog_alerts.html', context=context)

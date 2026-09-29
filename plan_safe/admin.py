@@ -46,9 +46,33 @@ class TimeZoneAdmin(admin.ModelAdmin):
 class StudyArmAdmin(admin.ModelAdmin):
     list_display = ('name', 'identifier',)
 
+class ReasonForLivingInline(admin.TabularInline):
+    model = ReasonForLiving
+
+    verbose_name = 'Reason for Living'
+    verbose_name_plural = 'Reasons for Living'
+    template = 'admin_inlines/reasons_for_living_tabular.html'
+
+    fields = ['created', 'caption', 'image']
+    readonly_fields = ['created', 'caption', 'image']
+    ordering = ('-created',)
+
+    def has_add_permission(self, request, obj=None): # pylint: disable=arguments-differ,unused-argument
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
 @admin.register(SafetyPlan)
 class SafetyPlanAdmin(admin.ModelAdmin):
     list_display = ('participant', 'created', 'last_updated')
+
+    inlines = [
+        ReasonForLivingInline,
+    ]
 
 @admin.register(SafetyPlanVersion)
 class SafetyPlanVersionAdmin(admin.ModelAdmin):
